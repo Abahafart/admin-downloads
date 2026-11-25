@@ -160,11 +160,12 @@ jobs:
           echo "pkg=0.0.0+ci${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
 
       - name: Desktop lint
-        working-directory: cmd/adesc-desktop
-        run: |
-          tags=desktop,production
-          if [ -n "${{ matrix.tags }}" ]; then tags="$tags,${{ matrix.tags }}"; fi
-          golangci-lint run --build-tags "$tags" ./...
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.15.0
+          install-mode: goinstall
+          working-directory: cmd/adesc-desktop
+          args: --timeout=5m --build-tags desktop,production${{ matrix.tags && format(',{0}', matrix.tags) || '' }}
 
       - name: Vet and test (desktop module)
         working-directory: cmd/adesc-desktop
@@ -188,7 +189,12 @@ jobs:
             if [ -f build/darwin/Info.plist ]; then
               cp build/darwin/Info.plist "build/bin/AdminDescargas.app/Contents/Info.plist"
             fi
-            go build -tags "$tags" -trimpath -ldflags "$ldflags" -o "build/bin/AdminDescargas.app/Contents/MacOS/adesc-desktop" .
+            # Universal binary: build each architecture, then merge with lipo.
+            for arch in arm64 amd64; do
+              GOARCH=$arch go build -tags "$tags" -trimpath -ldflags "$ldflags" -o "build/bin/adesc-desktop-$arch" .
+            done
+            lipo -create -output "build/bin/AdminDescargas.app/Contents/MacOS/adesc-desktop" \
+              build/bin/adesc-desktop-arm64 build/bin/adesc-desktop-amd64
           else
             go build -tags "$tags" -trimpath -ldflags "$ldflags" -o build/bin/adesc-desktop .
           fi
@@ -205,7 +211,7 @@ jobs:
         run: |
           mkdir -p build/dist
           app=$(ls -d build/bin/*.app | head -n1)
-          lipo -info "$app/Contents/MacOS/adesc-desktop" || true
+          lipo -info "$app/Contents/MacOS/adesc-desktop" | grep -q "x86_64 arm64\|arm64 x86_64"
           hdiutil create -volname AdminDescargas -srcfolder "$app" -ov -format UDZO build/dist/AdminDescargas.dmg
 
       - name: Smoke test (xvfb)
