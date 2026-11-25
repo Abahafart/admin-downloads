@@ -1,0 +1,4 @@
+{"value":[
+{"id":"ROOT!102","name":"plan.docx","size":100,"file":{"mimeType":"application/octet-stream","hashes":{"sha1Hash":"A94A8FE5CCB19BA61C4C0873D391E987982FBBD3","quickXorHash":"x"}}},
+{"id":"ROOT!103","name":"Assets","folder":{"childCount":2}}
+],"@odata.nextLink":"__BASE__/shares/__SHARE__/root/children?$skiptoken=P2"}

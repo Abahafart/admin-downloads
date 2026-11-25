@@ -1,0 +1,1 @@
+{"response":{"action":"folder/get_content","folder_content":{"chunk_size":"100","content_type":"folders","chunk_number":"1","folders":[],"more_chunks":"no"},"result":"Success","current_api_version":"1.5"}}

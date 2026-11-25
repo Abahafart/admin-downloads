@@ -1,0 +1,26 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "AdminDescargas",
+  "outputfilename": "adesc-desktop",
+  "frontend:dir": "../../web",
+  "frontend:install": "",
+  "frontend:build": "",
+  "wailsjsdir": "./build/wailsjs",
+  "author": {
+    "name": "AdminDescargas"
+  },
+  "info": {
+    "companyName": "AdminDescargas",
+    "productName": "AdminDescargas",
+    "productVersion": "0.1.0",
+    "copyright": "AdminDescargas",
+    "comments": "Gestor de descargas multi-hoster",
+    "protocols": [
+      {
+        "scheme": "adesc",
+        "description": "Añadir enlaces a AdminDescargas",
+        "role": "Viewer"
+      }
+    ]
+  }
+}

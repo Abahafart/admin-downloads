@@ -1,0 +1,5 @@
+{"success":true,"id":"L1st01","title":"My Album","date_created":"2026-01-01T00:00:00Z","file_count":3,"files":[
+{"detail_href":"/file/f1aaaa/info","description":"","id":"f1aaaa","name":"part.rar","size":100,"hash_sha256":"aa"},
+{"detail_href":"/file/f2bbbb/info","description":"","id":"f2bbbb","name":"part.rar","size":200,"hash_sha256":"bb"},
+{"detail_href":"/file/f3cccc/info","description":"","id":"f3cccc","name":"readme.txt","size":0}
+]}

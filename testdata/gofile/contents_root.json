@@ -1,0 +1,5 @@
+{"status":"ok","data":{"id":"f0lder01","type":"folder","name":"Season 1","code":"AbCdEf","createTime":1700000000,"public":true,"childrenCount":3,"children":{
+"file0001":{"id":"file0001","type":"file","name":"ep01.mkv","size":1234,"md5":"5D41402ABC4B2A76B9719D911017C592","link":"__BASE__/download/web/file0001/ep01.mkv","mimetype":"video/x-matroska"},
+"file0002":{"id":"file0002","type":"file","name":"cover.jpg","size":10,"link":"__BASE__/download/web/file0002/cover.jpg"},
+"sub00001":{"id":"sub00001","type":"folder","name":"Extras","childrenCount":1}
+}}}

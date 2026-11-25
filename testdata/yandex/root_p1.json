@@ -1,0 +1,4 @@
+{"public_key":"https://disk.yandex.ru/d/AbCd123","name":"Música","path":"/","type":"dir","_embedded":{"limit":2,"offset":0,"total":3,"path":"/","public_key":"https://disk.yandex.ru/d/AbCd123","items":[
+{"name":"Album 1","path":"/Album 1","type":"dir"},
+{"name":"cover.jpg","path":"/cover.jpg","type":"file","size":2048,"md5":"5D41402ABC4B2A76B9719D911017C592","sha256":"","file":"https://downloader.disk.yandex.ru/disk/REDACTED"}
+]}}

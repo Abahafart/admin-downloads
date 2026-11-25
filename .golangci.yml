@@ -1,0 +1,82 @@
+# golangci-lint v2 configuration.
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  default: standard # errcheck, govet, ineffassign, staticcheck, unused
+  enable:
+    - bodyclose
+    - errorlint
+    - gosec
+    - misspell
+    - nilerr
+    - noctx
+    - revive
+    - unconvert
+    - usestdlibvars
+  settings:
+    staticcheck:
+      # Default set minus QF1001 (De Morgan): the negated character-class
+      # checks read better as written.
+      checks: ["all", "-ST1000", "-ST1003", "-ST1016", "-ST1020", "-ST1021", "-ST1022", "-QF1001"]
+    errcheck:
+      exclude-functions:
+        - (io.Closer).Close
+        - (*os.File).Close
+    gosec:
+      excludes:
+        - G104 # duplicated by errcheck
+        - G204 # system VPN / router commands are argv from config.toml by design
+        - G304 # file paths come from config or fsutil.SafeJoin
+    misspell:
+      locale: US
+      # Spanish words in user-facing strings and comments.
+      ignore-rules:
+        - argumentos
+        - comandos
+        - extensiones
+        - secretos
+    revive:
+      rules:
+        - name: exported
+        - name: package-comments
+        - name: var-naming
+        - name: error-strings
+        - name: error-return
+        - name: context-as-argument
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - std-error-handling
+    rules:
+      - path: _test\.go
+        linters: [gosec, noctx, bodyclose, errcheck]
+      # Errors wrap only our own sentinel (%w) and keep the underlying error
+      # as text (%v) on purpose, so errors.Is/As classify by our sentinel.
+      - linters: [errorlint]
+        text: non-wrapping format verb
+        source: '"%w[^"]*%v'
+      # Client-side cookies for http.CookieJar (hoster sessions, imported
+      # cookies.txt), not Set-Cookie headers we send.
+      - path: internal/(accounts|hosters)/
+        linters: [gosec]
+        text: G124
+      # Queries only concatenate constant column lists and ? placeholders.
+      - path: internal/store/
+        linters: [gosec]
+        text: G202
+    paths:
+      - web/node_modules
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - admindescargas

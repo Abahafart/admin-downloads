@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>D · Monocromo — Descargas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&amp;family=Geist+Mono:wght@400&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="min-height: 100vh; box-sizing: border-box; display: flex; flex-wrap: wrap; background: {{t.bg}}; color: {{t.text}}; font-family: Geist, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; line-height: 1.45">
+
+<aside style="flex: 1 1 300px; max-width: 100%; box-sizing: border-box; padding: 40px 40px 32px; display: flex; flex-direction: column; gap: 40px">
+<span style="font-weight: 600; letter-spacing: 0.02em">ADESC</span>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; color: {{t.muted}}">Velocidad total</span>
+<span style="font-size: 80px; font-weight: 300; line-height: 1; letter-spacing: -0.04em; font-variant-numeric: tabular-nums">24,5</span>
+<span style="color: {{t.muted}}">MB/s · 2 activas</span>
+</div>
+<dl style="margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 20px; font-size: 13px">
+<dt style="color: {{t.muted}}">Salida</dt><dd style="margin: 0">WireGuard</dd>
+<dt style="color: {{t.muted}}">IP</dt><dd style="margin: 0; font-family: 'Geist Mono', ui-monospace, monospace">203.0.113.24</dd>
+<dt style="color: {{t.muted}}">Portapapeles</dt><dd style="margin: 0">Vigilando</dd>
+</dl>
+<nav aria-label="Principal" style="display: flex; flex-direction: column; gap: 2px; margin-top: auto">
+<a href="#" aria-current="page" style="display: flex; align-items: center; min-height: 36px; color: {{t.text}}; text-decoration: underline; text-underline-offset: 6px">Descargas</a>
+<a href="#" style="display: flex; align-items: center; min-height: 36px; color: {{t.muted}}; text-decoration: none">LinkGrabber (3)</a>
+<a href="#" style="display: flex; align-items: center; min-height: 36px; color: {{t.muted}}; text-decoration: none">Cuentas</a>
+<a href="#" style="display: flex; align-items: center; min-height: 36px; color: {{t.muted}}; text-decoration: none">Red y rotación</a>
+<a href="#" style="display: flex; align-items: center; min-height: 36px; color: {{t.muted}}; text-decoration: none">Ajustes</a>
+</nav>
+</aside>
+
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 40px 40px 32px; border-left: 1px solid {{t.line}}; display: flex; flex-direction: column; gap: 28px">
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+<h1 style="margin: 0 auto 0 0; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em">Cola · 7</h1>
+<button type="button" style="min-height: 40px; padding: 0 18px; border: 1px solid {{t.line2}}; border-radius: 0; background: transparent; color: {{t.text}}; font: inherit; cursor: pointer">Pausar todo</button>
+<button type="button" style="min-height: 40px; padding: 0 18px; border: 0; border-radius: 0; background: {{accent}}; color: {{t.onAccent}}; font: inherit; font-weight: 500; cursor: pointer">+ Añadir enlaces</button>
+</header>
+
+<div style="overflow-x: auto">
+<ol style="list-style: none; margin: 0; padding: 0; min-width: 720px; border-top: 1px solid {{t.line2}}; font-variant-numeric: tabular-nums">
+
+<li style="display: grid; grid-template-columns: minmax(0, 1fr) 120px 120px 150px; gap: 20px; align-items: end; padding: 18px 0 16px; border-bottom: 1px solid {{t.line}}">
+<div style="display: flex; flex-direction: column; gap: 10px"><span style="font-size: 16px; font-weight: 500">Curso_Fotografia/ <span style="color: {{t.muted}}; font-weight: 400">12 archivos</span></span><div style="height: 1px; background: {{t.line2}}"><div style="width: 62%; height: 2px; margin-top: -0.5px; background: {{accent}}"></div></div></div>
+<span style="color: {{t.muted}}">MEGA</span><span>18,4 MB/s</span><span style="text-align: right">62% · 1:24</span>
+</li>
+
+<li style="display: grid; grid-template-columns: minmax(0, 1fr) 120px 120px 150px; gap: 20px; align-items: end; padding: 18px 0 16px; border-bottom: 1px solid {{t.line}}">
+<div style="display: flex; flex-direction: column; gap: 10px"><span style="font-size: 16px; font-weight: 500">dataset_v2.zip</span><div style="height: 1px; background: {{t.line2}}"><div style="width: 34%; height: 2px; margin-top: -0.5px; background: {{accent}}"></div></div></div>
+<span style="color: {{t.muted}}">Google Drive</span><span>6,1 MB/s</span><span style="text-align: right">34% · 3:10</span>
+</li>
+
+<li style="display: grid; grid-template-columns: minmax(0, 1fr) 120px 120px 150px; gap: 20px; align-items: end; padding: 18px 0 16px; border-bottom: 1px solid {{t.line}}">
+<div style="display: flex; flex-direction: column; gap: 10px"><span style="font-size: 16px; font-weight: 500">Album_2019.rar</span><div style="height: 1px; background: {{t.line2}}"><div style="width: 47%; height: 2px; margin-top: -0.5px; background: repeating-linear-gradient(90deg, {{t.text}} 0 4px, transparent 4px 8px)"></div></div></div>
+<span style="color: {{t.muted}}">MediaFire</span><span style="font-style: italic">Cuota por IP</span><span style="text-align: right">reintenta en 04:12</span>
+</li>
+
+<li style="display: grid; grid-template-columns: minmax(0, 1fr) 120px 120px 150px; gap: 20px; align-items: end; padding: 18px 0 16px; border-bottom: 1px solid {{t.line}}; color: {{t.muted}}">
+<div style="display: flex; flex-direction: column; gap: 10px"><span style="font-size: 16px; font-weight: 500; color: {{t.text}}">backup_fotos.7z</span><div style="height: 1px; background: {{t.line2}}"><div style="width: 18%; height: 2px; margin-top: -0.5px; background: {{t.muted}}"></div></div></div>
+<span>TeraBox</span><span>Pausada</span><span style="text-align: right">18%</span>
+</li>
+
+<li style="display: grid; grid-template-columns: minmax(0, 1fr) 120px 120px 150px; gap: 20px; align-items: center; padding: 18px 0 16px; border-bottom: 1px solid {{t.line}}">
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 16px; font-weight: 500">video_presentacion.mp4</span><span style="color: {{t.muted}}; font-size: 13px">Cuota del archivo excedida — rotar IP no ayuda</span></div>
+<span style="color: {{t.muted}}">Google Drive</span><span style="font-weight: 600">Fallida</span><span style="text-align: right"><button type="button" style="min-height: 36px; padding: 0 14px; border: 1px solid {{t.line2}}; border-radius: 0; background: transparent; color: {{t.text}}; font: inherit; cursor: pointer">Reintentar</button></span>
+</li>
+
+<li style="display: grid; grid-template-columns: minmax(0, 1fr) 120px 120px 150px; gap: 20px; align-items: end; padding: 18px 0 16px; border-bottom: 1px solid {{t.line}}; color: {{t.muted}}">
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 16px; font-weight: 500; color: {{t.text}}">instalador.iso</span><span style="font-size: 13px">No reanudable</span></div>
+<span>HTTP</span><span>En cola</span><span style="text-align: right">3,1 GB</span>
+</li>
+
+<li style="display: grid; grid-template-columns: minmax(0, 1fr) 120px 120px 150px; gap: 20px; align-items: end; padding: 18px 0 16px; color: {{t.muted}}">
+<span style="font-size: 16px; text-decoration: line-through; text-decoration-thickness: 1px">manual.pdf</span>
+<span>MediaFire</span><span>Completada</span><span style="text-align: right">14 MB</span>
+</li>
+</ol>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"tema":{"editor":"enum","options":["oscuro","claro"],"default":"oscuro"},"accent":{"editor":"color","default":"#ffffff","options":["#ffffff","#0a0a0a","#ff5a36","#c6ff3d"]},"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+renderVals() {
+const claro = this.props.tema === 'claro';
+const t = claro ? {
+bg: '#ffffff', text: '#0a0a0a', muted: '#5e5e5e', line: '#e8e8e8', line2: '#bdbdbd', onAccent: '#ffffff'
+} : {
+bg: '#000000', text: '#f5f5f5', muted: '#9b9b9b', line: '#1c1c1c', line2: '#3d3d3d', onAccent: '#000000'
+};
+const accent = this.props.accent ?? (claro ? '#0a0a0a' : '#ffffff');
+return { t, accent };
+}
+}
+</script>
+</body>
+</html>

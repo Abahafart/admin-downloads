@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=AdminDescargas
+GenericName=Gestor de descargas
+Comment=Gestor de descargas multi-hoster (MEGA, MediaFire, Google Drive, TeraBox...)
+Exec=adesc-desktop %U
+Icon=admindescargas
+Terminal=false
+Categories=Network;FileTransfer;
+Keywords=descargas;download;mega;mediafire;
+MimeType=x-scheme-handler/adesc;
+StartupWMClass=adesc-desktop
+StartupNotify=true

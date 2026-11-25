@@ -1,0 +1,5 @@
+# Keep LF everywhere so gofmt/golangci-lint behave the same on Windows CI.
+* text=auto eol=lf
+*.png binary
+*.ico binary
+*.icns binary

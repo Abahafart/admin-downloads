@@ -1,0 +1,1 @@
+{"response":{"action":"user/get_info","user_info":{"email":"user@example.com","display_name":"Example","premium":"yes","used_storage_size":"1048576","storage_limit":"10737418240"},"result":"Success","current_api_version":"1.5"}}

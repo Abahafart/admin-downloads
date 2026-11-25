@@ -1,0 +1,62 @@
+{
+ "files": [
+  {
+   "size": 10,
+   "link_key": "MekSHe11vu1zC4h7VRG3W2SPjhk6BsMH4SoBU8IpESg",
+   "aes_key_hex": "55669c04d7737dea922189289738a673",
+   "nonce_hex": "648f8e193a06c307",
+   "meta_mac_hex": "e12a0153c2291128",
+   "ciphertext_sha256": "7a18d38c62c74d66bdc5b5cd8d2aa85d5e63cdcb9cd9650a426c11c461e140c0",
+   "attr": "qSyoKByX0ymoQk0Qo8pLWyktBxGuuTV1RWB7IISzv-8",
+   "name": "vector 0.bin"
+  },
+  {
+   "size": 131072,
+   "link_key": "yQ0Lh7sJknbCnaSLUzNk4Ap4AJWRcizIbDFurZzWOKg",
+   "aes_key_hex": "c3750b122a7bbebeaeacca26cfe55c48",
+   "nonce_hex": "0a78009591722cc8",
+   "meta_mac_hex": "6c316ead9cd638a8",
+   "ciphertext_sha256": "9357501bb41730ae99e635a62b403fbe3b1cbd84a353118c9958a26d9ee43f01",
+   "attr": "Rqo3FVxxE_NH81uFlwMLty5kL73mmPRjzGwWXMZtB80",
+   "name": "vector 1.bin"
+  },
+  {
+   "size": 131073,
+   "link_key": "fiCLTygGh2lpwHtA037P6GJuHjtpNcZqkY1GdeBL-bU",
+   "aes_key_hex": "1c4e957441334103f84d3d353335365d",
+   "nonce_hex": "626e1e3b6935c66a",
+   "meta_mac_hex": "918d4675e04bf9b5",
+   "ciphertext_sha256": "f9b1bcb2a1e94a45376b1b0801c7e614aa1c42cabbfbc4d1fd1a08ddd76ce2ab",
+   "attr": "ptYsDO5744CHFZX-tLgo2AWgRYjwY08xFEdgGoLnfJk",
+   "name": "vector 2.bin"
+  },
+  {
+   "size": 1572987,
+   "link_key": "B_XAMoq0OXFEVuSlZvs0HA9fkkUApNcDeBmwzJP3bV4",
+   "aes_key_hex": "08aa52778a10ee723c4f5469f50c5942",
+   "nonce_hex": "0f5f924500a4d703",
+   "meta_mac_hex": "7819b0cc93f76d5e",
+   "ciphertext_sha256": "0c06e1599f8351d4d857d430f33535b4eaf97722c7147706813955455815bd68",
+   "attr": "ZXjQiD7Jat1flMCesh8Qyhurrq50yzFnEqOpuwuf-Sc",
+   "name": "vector 3.bin"
+  }
+ ],
+ "login": {
+  "password": "correct horse battery",
+  "email": "Tester@Example.com",
+  "v1_passkey_hex": "cc82fafc29c562b65fda51d265c0817b",
+  "v1_uh": "lYjMM9Oacr0",
+  "v2_salt": "Y0ea1poJCyWCd-yPum-ZQZov-ySJgVEGV8lEzNEUjpc",
+  "v2_passkey_hex": "92dc195179491b5bfa0b451439ad04b0",
+  "v2_uh": "XSlZKiGfi4skroegTJiwzA"
+ },
+ "folder": {
+  "handle": "SBNJTRN-",
+  "key": "oypUROBVM8E8dUecOWOpaQ",
+  "sub_handle": "6LwWPILu",
+  "file_handle": "P1JM3Aeh",
+  "ep01_key": "BQ_uHMm6zluHLGoJCeEB7A6LKM2SM2Jg0nTIA0x6ju0",
+  "bad_attr_handle": "Pv2m7njD",
+  "orphan_handle": "kyfKmarq"
+ }
+}

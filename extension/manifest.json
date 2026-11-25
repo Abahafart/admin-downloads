@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "AdminDescargas",
+  "short_name": "AdminDescargas",
+  "version": "0.1.0",
+  "description": "Envía enlaces, descargas y cookies de hosters a AdminDescargas.",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "scripts": ["background.js"],
+    "type": "module"
+  },
+  "action": {
+    "default_title": "AdminDescargas",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "permissions": ["contextMenus", "storage", "alarms", "notifications", "downloads", "activeTab"],
+  "optional_permissions": ["cookies"],
+  "host_permissions": ["http://127.0.0.1/*", "http://localhost/*"],
+  "optional_host_permissions": ["<all_urls>"],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "admindescargas@admindescargas.local",
+      "strict_min_version": "128.0",
+      "data_collection_permissions": { "required": ["none"] }
+    }
+  }
+}

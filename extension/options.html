@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdminDescargas: opciones</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <h1>AdminDescargas</h1>
+  <p class="lead">Conecta la extensión con el daemon o la app de escritorio.</p>
+
+  <section>
+    <h2>Conexión</h2>
+    <label for="daemonUrl">URL del daemon</label>
+    <input id="daemonUrl" type="url" placeholder="http://127.0.0.1:7979" autocomplete="off">
+    <p class="hint">Si no es local, el navegador te pedirá permiso para acceder a esa dirección.</p>
+
+    <label for="token">Token de la API</label>
+    <input id="token" type="password" autocomplete="off" spellcheck="false">
+    <p class="hint">Es el valor de <code>[server].token</code> en <code>config.toml</code>. Se guarda solo en este navegador.</p>
+
+    <label class="inline"><input id="autoConfirm" type="checkbox"> Añadir directamente a la cola (sin pasar por el LinkGrabber)</label>
+
+    <p class="hint">Origen de esta extensión (añádelo a <code>server.allowed_origins</code> si el daemon lo rechaza): <code id="origin"></code></p>
+
+    <div class="row">
+      <button id="save" class="primary">Guardar</button>
+      <button id="test">Probar conexión</button>
+    </div>
+    <p id="connStatus" class="status" role="status"></p>
+  </section>
+
+  <section>
+    <h2>Captura de descargas</h2>
+    <label class="inline"><input id="capEnabled" type="checkbox"> Capturar las descargas del navegador que cumplan estas reglas</label>
+    <p class="hint">La descarga se cancela en el navegador y se envía a AdminDescargas. Si el daemon no responde, vuelve a descargarse en el navegador.</p>
+
+    <label for="capExt">Extensiones</label>
+    <textarea id="capExt" spellcheck="false"></textarea>
+    <p class="hint">Separadas por comas o espacios. Vacío = cualquier extensión.</p>
+
+    <label for="capMin">Tamaño mínimo (MB)</label>
+    <input id="capMin" type="number" min="0" step="0.1">
+    <p class="hint">Si el navegador no conoce el tamaño, la regla no se aplica.</p>
+
+    <label for="capInclude">Solo estos dominios</label>
+    <textarea id="capInclude" spellcheck="false" placeholder="mediafire.com, /^cdn\d+\.example\.org$/"></textarea>
+    <p class="hint">Vacío = todos. <code>example.com</code> incluye sus subdominios; <code>/expresión/</code> es una expresión regular sobre el nombre del host.</p>
+
+    <label for="capExclude">Excluir estos dominios</label>
+    <textarea id="capExclude" spellcheck="false"></textarea>
+
+    <label class="inline"><input id="capSkipIncognito" type="checkbox"> No capturar en ventanas privadas</label>
+
+    <div class="row">
+      <button id="saveCapture" class="primary">Guardar reglas</button>
+    </div>
+    <p id="capStatus" class="status" role="status"></p>
+  </section>
+
+  <section>
+    <h2>Exportar cookies a una cuenta</h2>
+    <p class="hint">Envía las cookies de tu sesión en un hoster a AdminDescargas para crear una cuenta de tipo cookie. Solo se leen al pulsar el botón, y el navegador te pedirá permiso para ese dominio.</p>
+    <label for="hoster">Hoster</label>
+    <select id="hoster"></select>
+    <p id="hosterWarn" class="warn" hidden>Estas cookies dan acceso a toda tu cuenta del proveedor (no solo al almacenamiento). Expórtalas solo a un daemon de confianza.</p>
+    <label for="label">Nombre de la cuenta</label>
+    <input id="label" type="text" autocomplete="off">
+    <label class="inline"><input id="revoke" type="checkbox" checked> Retirar el permiso de cookies después de exportar</label>
+    <div class="row">
+      <button id="export" class="primary">Exportar cookies</button>
+    </div>
+    <p id="cookieStatus" class="status" role="status"></p>
+  </section>
+</main>
+<script type="module" src="options.js"></script>
+</body>
+</html>

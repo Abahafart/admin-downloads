@@ -1,0 +1,59 @@
+/* B · Terminal: the shared screens (LinkGrabber, Cuentas, Red, Ajustes)
+   restyled as terminal lists and forms. Scoped to the Terminal shell's
+   <main id="contenido" class="t-shared">, which exists only in this style
+   and only outside Descargas. */
+
+#contenido.t-shared h1 {
+  font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--muted); text-transform: lowercase;
+}
+#contenido.t-shared h1::before { content: '## '; }
+#contenido.t-shared h2,
+#contenido.t-shared legend { font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--text); text-transform: lowercase; }
+#contenido.t-shared h2::before,
+#contenido.t-shared legend::before { content: '### '; color: var(--muted); }
+#contenido.t-shared h3 { font-size: 13px; font-weight: 500; }
+
+#contenido.t-shared .panel { border: 1px dashed var(--border-strong); border-radius: 0; background: transparent; }
+#contenido.t-shared .table-wrap { border: 0; border-radius: 0; background: transparent; }
+#contenido.t-shared .table th {
+  font-size: 13px; font-weight: 400; letter-spacing: 0; text-transform: lowercase; color: var(--muted);
+  border-bottom: 1px dashed var(--border-strong);
+}
+#contenido.t-shared .table td { border-bottom: 0; padding-top: 8px; padding-bottom: 8px; }
+#contenido.t-shared .table th:first-child,
+#contenido.t-shared .table td:first-child { padding-left: 0; }
+#contenido.t-shared .table tbody tr:hover { background: var(--surface); }
+
+#contenido.t-shared .btn { border-radius: 0; font-weight: 400; }
+#contenido.t-shared .btn-primary {
+  min-height: 40px; background: transparent; color: var(--accent); border-color: var(--accent); font-weight: 700;
+}
+#contenido.t-shared .btn-primary::before { content: '['; }
+#contenido.t-shared .btn-primary::after { content: ']'; }
+#contenido.t-shared .btn-primary:hover:not(:disabled) { background: var(--raised); }
+#contenido.t-shared .btn-primary:disabled { background: transparent; color: var(--muted); border-color: var(--border-strong); }
+#contenido.t-shared .btn-danger { color: var(--err); }
+
+#contenido.t-shared .input,
+#contenido.t-shared .select,
+#contenido.t-shared .textarea { border-radius: 0; background: var(--bg); font-family: var(--font-mono); }
+#contenido.t-shared .field > span,
+#contenido.t-shared .field-label { text-transform: lowercase; }
+#contenido.t-shared .badge { border: 0; padding: 0; color: var(--muted); font-size: 12px; }
+#contenido.t-shared .badge::before { content: '['; }
+#contenido.t-shared .badge::after { content: ']'; }
+#contenido.t-shared .count-badge { background: transparent; color: var(--accent); }
+#contenido.t-shared [role='progressbar'],
+#contenido.t-shared [role='progressbar'] > * { border-radius: 0; }
+#contenido.t-shared .hint { font-size: 12px; }
+#contenido.t-shared .hint::before { content: '# '; }
+#contenido.t-shared .panel .hint::before { content: ''; }
+#contenido.t-shared input[type='checkbox'],
+#contenido.t-shared input[type='radio'] { accent-color: var(--accent); }
+#contenido.t-shared code { color: var(--text-2); }
+/* LinkGrabber's sticky "Descargar" bar sits above the sticky shortcut bar. */
+#contenido.t-shared .confirm { bottom: var(--t-foot, 40px); background: var(--bg); border-style: solid; }
+#contenido.t-shared .pname .input:not(:focus):not(:hover) { background: transparent; border-color: transparent; }
+/* Contains the .sr-only (position: absolute) cells of wide tables so they
+   scroll with the table instead of widening the page on phones. */
+#contenido.t-shared .table-wrap { position: relative; }

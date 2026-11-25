@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>AdminDescargas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="popup">
+<main>
+  <h2>AdminDescargas</h2>
+  <p id="state" class="status" role="status">Conectando…</p>
+  <div class="grid" id="grid" hidden>
+    <div><span>Activas</span><span id="active">0</span></div>
+    <div><span>En cola</span><span id="queued">0</span></div>
+    <div><span>Esperando</span><span id="waiting">0</span></div>
+    <div><span>Fallidas</span><span id="failed">0</span></div>
+    <div><span>Completadas</span><span id="completed">0</span></div>
+    <div><span>LinkGrabber</span><span id="grabber">0</span></div>
+  </div>
+  <button id="sendPage" class="primary">Enviar página actual</button>
+  <button id="options">Opciones</button>
+</main>
+<script type="module" src="popup.js"></script>
+</body>
+</html>

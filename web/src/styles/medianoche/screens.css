@@ -1,0 +1,33 @@
+/* C · Medianoche: the shared screens (LinkGrabber, Cuentas, Red, Ajustes)
+   in the language of its cards: rounded panels, pill buttons, friendly
+   headings without uppercase. Scoped to <main id="contenido" class="m-shared">,
+   which exists only in this style and only outside Descargas. */
+
+#contenido.m-shared h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+#contenido.m-shared h2 { font-size: 16px; font-weight: 500; letter-spacing: 0; }
+#contenido.m-shared legend { font-weight: 500; }
+
+#contenido.m-shared .panel { border-radius: var(--radius-lg); background: var(--surface); border-color: var(--border); }
+#contenido.m-shared .panel.pad,
+#contenido.m-shared form.panel { padding: 20px; }
+#contenido.m-shared .table-wrap { border-radius: var(--radius-lg); }
+#contenido.m-shared .table th {
+  font-size: 12px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--muted);
+}
+#contenido.m-shared .table td { padding-top: 14px; padding-bottom: 14px; }
+
+#contenido.m-shared .btn { border-radius: var(--radius-pill); padding: 0 16px; }
+#contenido.m-shared .btn-icon { padding: 0; }
+#contenido.m-shared .btn-primary { min-height: 44px; }
+#contenido.m-shared .input,
+#contenido.m-shared .select,
+#contenido.m-shared .textarea { border-radius: var(--radius-md); border-color: var(--border-strong); background: var(--bg); }
+#contenido.m-shared .badge { border-radius: var(--radius-sm); padding: 2px 8px; font-size: 12px; }
+#contenido.m-shared [role='progressbar'] { height: 6px; }
+#contenido.m-shared .entry { padding: 12px 20px 16px; }
+#contenido.m-shared .style,
+#contenido.m-shared .opt { border-radius: var(--radius-md); }
+#contenido.m-shared .pname .input:not(:focus):not(:hover) { background: transparent; border-color: transparent; }
+/* Contains the .sr-only (position: absolute) cells of wide tables so they
+   scroll with the table instead of widening the page on phones. */
+#contenido.m-shared .table-wrap { position: relative; }

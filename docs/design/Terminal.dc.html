@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>B · Terminal — Descargas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="min-height: 100vh; box-sizing: border-box; display: flex; flex-direction: column; background: {{t.bg}}; color: {{t.text}}; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 13px; line-height: 1.6">
+
+<nav aria-label="Principal" style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 20px; padding: 14px 28px; border-bottom: 1px solid {{t.border}}">
+<span style="font-weight: 700; color: {{accent}}; margin-right: 12px">adesc</span>
+<a href="#" aria-current="page" style="color: {{t.text}}; text-decoration: none; min-height: 32px; display: flex; align-items: center">[descargas]</a>
+<a href="#" style="color: {{t.muted}}; text-decoration: none; min-height: 32px; display: flex; align-items: center">linkgrabber·3</a>
+<a href="#" style="color: {{t.muted}}; text-decoration: none; min-height: 32px; display: flex; align-items: center">cuentas</a>
+<a href="#" style="color: {{t.muted}}; text-decoration: none; min-height: 32px; display: flex; align-items: center">red</a>
+<a href="#" style="color: {{t.muted}}; text-decoration: none; min-height: 32px; display: flex; align-items: center">ajustes</a>
+<span style="margin-left: auto; color: {{t.muted}}">↓ <span style="color: {{t.text}}">24.5 MB/s</span>  ·  wg0 203.0.113.24</span>
+</nav>
+
+<div style="padding: 24px 28px 0">
+<label style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 16px; border: 1px solid {{t.border2}}; border-radius: 4px; background: {{t.surface}}">
+<span style="color: {{accent}}; font-weight: 700" aria-hidden="true">›</span>
+<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Pegar enlaces o escribir un comando</span>
+<input type="text" placeholder="pega enlaces · /pausa · /rotar · /reintentar fallidas" style="flex: 1; border: 0; outline: 0; background: transparent; font: inherit; color: {{t.text}}">
+<span style="color: {{t.muted}}">ctrl+k</span>
+</label>
+</div>
+
+<main style="flex: 1; padding: 20px 28px; display: flex; flex-direction: column; gap: 4px; overflow-x: auto">
+<h1 style="margin: 0 0 8px; font-size: 13px; font-weight: 500; color: {{t.muted}}">## cola — 7 elementos, 2 activos</h1>
+
+<div style="min-width: 900px; display: flex; flex-direction: column">
+<div style="display: grid; grid-template-columns: 28px minmax(0, 2.2fr) 110px 80px minmax(0, 1.6fr) 100px 170px; gap: 16px; padding: 6px 0; color: {{t.muted}}; border-bottom: 1px dashed {{t.border2}}">
+<span>st</span><span>nombre</span><span>hoster</span><span>tamaño</span><span>progreso</span><span>vel</span><span>estado / salida</span>
+</div>
+
+<div style="display: grid; grid-template-columns: 28px minmax(0, 2.2fr) 110px 80px minmax(0, 1.6fr) 100px 170px; gap: 16px; padding: 8px 0; align-items: baseline">
+<span style="color: {{accent}}">▸</span><span>Curso_Fotografia/ <span style="color: {{t.muted}}">(12)</span></span><span style="color: {{t.muted}}">mega</span><span style="color: {{t.muted}}">4.2G</span><span><span style="color: {{accent}}">████████████</span><span style="color: {{t.empty}}">░░░░░░░</span> 62%</span><span>18.4M/s</span><span>eta 1:24 · wg0</span>
+</div>
+<div style="display: grid; grid-template-columns: 28px minmax(0, 2.2fr) 110px 80px minmax(0, 1.6fr) 100px 170px; gap: 16px; padding: 2px 0; align-items: baseline; color: {{t.text2}}">
+<span></span><span>  └ clase_01.mp4</span><span></span><span>380M</span><span><span style="color: {{accent}}">█████████████████</span><span style="color: {{t.empty}}">░░</span> 88%</span><span>9.6M/s</span><span>4 seg</span>
+</div>
+<div style="display: grid; grid-template-columns: 28px minmax(0, 2.2fr) 110px 80px minmax(0, 1.6fr) 100px 170px; gap: 16px; padding: 2px 0 8px; align-items: baseline; color: {{t.text2}}">
+<span></span><span>  └ clase_02.mp4</span><span></span><span>412M</span><span><span style="color: {{accent}}">███████</span><span style="color: {{t.empty}}">░░░░░░░░░░░░</span> 36%</span><span>8.8M/s</span><span>4 seg</span>
+</div>
+
+<div style="display: grid; grid-template-columns: 28px minmax(0, 2.2fr) 110px 80px minmax(0, 1.6fr) 100px 170px; gap: 16px; padding: 8px 0; align-items: baseline">
+<span style="color: {{accent}}">▸</span><span>dataset_v2.zip</span><span style="color: {{t.muted}}">gdrive</span><span style="color: {{t.muted}}">1.8G</span><span><span style="color: {{accent}}">██████</span><span style="color: {{t.empty}}">░░░░░░░░░░░░░</span> 34%</span><span>6.1M/s</span><span>eta 3:10 · directa</span>
+</div>
+<div style="display: grid; grid-template-columns: 28px minmax(0, 2.2fr) 110px 80px minmax(0, 1.6fr) 100px 170px; gap: 16px; padding: 8px 0; align-items: baseline">
+<span style="color: {{t.warn}}">◷</span><span>Album_2019.rar</span><span style="color: {{t.muted}}">mediafire</span><span style="color: {{t.muted}}">640M</span><span><span style="color: {{t.warn}}">█████████</span><span style="color: {{t.empty}}">░░░░░░░░░░</span> 47%</span><span style="color: {{t.muted}}">—</span><span style="color: {{t.warn}}">cuota ip 04:12 · tor</span>
+</div>
+<div style="display: grid; grid-template-columns: 28px minmax(0, 2.2fr) 110px 80px minmax(0, 1.6fr) 100px 170px; gap: 16px; padding: 8px 0; align-items: baseline; color: {{t.muted}}">
+<span>‖</span><span style="color: {{t.text}}">backup_fotos.7z</span><span>terabox</span><span>2.3G</span><span><span style="color: {{t.paused}}">███</span><span style="color: {{t.empty}}">░░░░░░░░░░░░░░░░</span> 18%</span><span>—</span><span>pausada · socks5</span>
+</div>
+<div style="display: grid; grid-template-columns: 28px minmax(0, 2.2fr) 110px 80px minmax(0, 1.6fr) 100px 170px; gap: 16px; padding: 8px 0; align-items: baseline">
+<span style="color: {{t.err}}">✕</span><span>video_presentacion.mp4</span><span style="color: {{t.muted}}">gdrive</span><span style="color: {{t.muted}}">920M</span><span style="color: {{t.err}}">cuota del archivo — rotar ip no sirve</span><span style="color: {{t.muted}}">—</span><span><button type="button" style="min-height: 28px; padding: 0 8px; border: 1px solid {{t.border2}}; border-radius: 3px; background: transparent; color: {{t.text}}; font: inherit; cursor: pointer">r reintentar</button></span>
+</div>
+<div style="display: grid; grid-template-columns: 28px minmax(0, 2.2fr) 110px 80px minmax(0, 1.6fr) 100px 170px; gap: 16px; padding: 8px 0; align-items: baseline; color: {{t.muted}}">
+<span>·</span><span style="color: {{t.text}}">instalador.iso <span style="color: {{t.muted}}">!no-range</span></span><span>http</span><span>3.1G</span><span><span style="color: {{t.empty}}">░░░░░░░░░░░░░░░░░░░</span>  0%</span><span>—</span><span>en cola</span>
+</div>
+<div style="display: grid; grid-template-columns: 28px minmax(0, 2.2fr) 110px 80px minmax(0, 1.6fr) 100px 170px; gap: 16px; padding: 8px 0; align-items: baseline; color: {{t.muted}}">
+<span>✓</span><span>manual.pdf</span><span>mediafire</span><span>14M</span><span><span style="color: {{t.done}}">███████████████████</span> 100%</span><span>—</span><span>completada</span>
+</div>
+</div>
+</main>
+
+<footer style="display: flex; flex-wrap: wrap; gap: 6px 24px; padding: 10px 28px; border-top: 1px solid {{t.border}}; color: {{t.muted}}; font-size: 12px">
+<span><span style="color: {{t.text}}">p</span> pausar</span>
+<span><span style="color: {{t.text}}">r</span> reintentar</span>
+<span><span style="color: {{t.text}}">R</span> reiniciar</span>
+<span><span style="color: {{t.text}}">i</span> rotar ip</span>
+<span><span style="color: {{t.text}}">/</span> buscar</span>
+<span style="margin-left: auto">portapapeles: <span style="color: {{accent}}">on</span></span>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"tema":{"editor":"enum","options":["oscuro","claro"],"default":"oscuro"},"accent":{"editor":"color","default":"#f0b45a","options":["#f0b45a","#8fd18a","#9a5a00","#2f6b2a"]},"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+renderVals() {
+const claro = this.props.tema === 'claro';
+const t = claro ? {
+bg: '#f4f1e9', surface: '#fbf9f4', border: '#e2ddd0', border2: '#cfc8b8', text: '#1d1b17', text2: '#3d3a33',
+muted: '#635d52', empty: '#d6cfbf', warn: '#7a5c14', err: '#ad2b1b', paused: '#9b9484', done: '#bdb5a3'
+} : {
+bg: '#0a0a09', surface: '#11110f', border: '#1f1e1b', border2: '#2e2c28', text: '#ebe6dc', text2: '#b5afa3',
+muted: '#8f8a80', empty: '#3a3833', warn: '#d9c7a0', err: '#f2917f', paused: '#6b675e', done: '#4a4741'
+};
+return { t, accent: this.props.accent ?? (claro ? '#9a5a00' : '#f0b45a') };
+}
+}
+</script>
+</body>
+</html>

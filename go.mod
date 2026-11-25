@@ -1,0 +1,88 @@
+module admindescargas
+
+go 1.27.3
+
+require (
+	github.com/PuerkitoBio/goquery v1.14.0
+	github.com/adrg/xdg v0.5.3
+	github.com/bodgit/sevenzip v1.6.5
+	github.com/cretz/bine v0.2.0
+	github.com/emersion/go-autostart v0.0.0-20250403115856-34830d6457d2
+	github.com/gofrs/flock v0.13.2
+	github.com/huin/goupnp v1.3.1
+	github.com/kardianos/service v1.3.0
+	github.com/nwaples/rardecode/v2 v2.4.6
+	github.com/pelletier/go-toml/v2 v2.4.3
+	github.com/pressly/goose/v3 v3.30.1
+	github.com/spf13/cobra v1.10.2
+	github.com/spf13/pflag v1.1.0
+	github.com/t3rm1n4l/go-mega v0.0.0-20260717075258-c6acd6a5bd04
+	github.com/things-go/go-socks5 v0.1.4
+	github.com/zalando/go-keyring v0.2.8
+	golang.design/x/clipboard v0.11.0
+	golang.org/x/crypto v0.59.0
+	golang.org/x/net v0.63.0
+	golang.org/x/oauth2 v0.38.0
+	golang.org/x/sync v0.25.0
+	golang.org/x/sys v0.50.0
+	golang.org/x/text v0.44.0
+	golang.org/x/time v0.16.0
+	golang.zx2c4.com/wireguard v0.0.0-20261024220952-b3bc704ef0ee
+	google.golang.org/api v0.317.0
+	modernc.org/sqlite v1.63.0
+)
+
+require (
+	cloud.google.com/go/auth v0.24.5 // indirect
+	cloud.google.com/go/auth/oauth2adapt v0.3.1 // indirect
+	cloud.google.com/go/compute/metadata v0.10.0 // indirect
+	github.com/andybalholm/brotli v1.3.0 // indirect
+	github.com/andybalholm/cascadia v1.3.5 // indirect
+	github.com/bodgit/plumbing v1.3.0 // indirect
+	github.com/bodgit/windows v1.0.1 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/danieljoos/wincred v1.2.3 // indirect
+	github.com/dustin/go-humanize v1.1.0 // indirect
+	github.com/ebitengine/purego v0.11.3 // indirect
+	github.com/felixge/httpsnoop v1.1.0 // indirect
+	github.com/go-logr/logr v1.4.4 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/godbus/dbus/v5 v5.2.4 // indirect
+	github.com/google/btree v1.1.3 // indirect
+	github.com/google/s2a-go v0.1.11 // indirect
+	github.com/google/uuid v1.6.0 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.3.25 // indirect
+	github.com/googleapis/gax-go/v2 v2.27.0 // indirect
+	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/klauspost/compress v1.20.5 // indirect
+	github.com/mattn/go-isatty v0.0.24 // indirect
+	github.com/mfridman/interpolate v0.2.0 // indirect
+	github.com/ncruces/go-strftime v1.1.0 // indirect
+	github.com/pierrec/lz4/v4 v4.1.34 // indirect
+	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
+	github.com/sethvargo/go-retry v0.5.0 // indirect
+	github.com/spf13/afero v1.15.0 // indirect
+	github.com/stangelandcl/ppmd v0.1.1 // indirect
+	github.com/ulikunitz/xz v0.5.17 // indirect
+	go.opentelemetry.io/auto/sdk v1.2.2 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.72.0 // indirect
+	go.opentelemetry.io/otel v1.47.0 // indirect
+	go.opentelemetry.io/otel/log v1.47.0 // indirect
+	go.opentelemetry.io/otel/metric v1.47.0 // indirect
+	go.opentelemetry.io/otel/trace v1.47.0 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
+	go4.org v0.0.0-20261028031214-ed6929a230fe // indirect
+	golang.design/x/x11 v0.2.0 // indirect
+	golang.org/x/exp/shiny v0.0.0-20261124000051-d6646c509b6d // indirect
+	golang.org/x/image v0.48.0 // indirect
+	golang.org/x/mobile v0.0.0-20261117202452-47699113848a // indirect
+	golang.zx2c4.com/wintun v0.0.0-20230126152724-0fa3db229ce2 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261123191846-1e707ab9fbc2 // indirect
+	google.golang.org/grpc v1.85.0 // indirect
+	google.golang.org/protobuf v1.36.12 // indirect
+	gvisor.dev/gvisor v0.0.0-20250503011706-39ed1f5ac29c // indirect
+	modernc.org/libc v1.82.13 // indirect
+	modernc.org/mathutil v1.7.1 // indirect
+	modernc.org/memory v1.13.0 // indirect
+)

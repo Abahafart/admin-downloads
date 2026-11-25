@@ -1,0 +1,49 @@
+/* D · Monocromo: the shared screens as thin-line lists, uppercase small
+   headings, square controls; no state color anywhere in this style:
+   warnings read in italics and errors in bold (the tokens are the text
+   color). Shared-screen rules are scoped to <main id="contenido"
+   class="d-shared">, which exists only in this style outside Descargas. */
+
+[data-estilo='monocromo'] .tone-warn { font-style: italic; }
+[data-estilo='monocromo'] .tone-err,
+[data-estilo='monocromo'] .error-text { font-weight: 600; }
+
+#contenido.d-shared h1 { font-size: 14px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; }
+#contenido.d-shared h2,
+#contenido.d-shared legend { font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+#contenido.d-shared h3 { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.12em; }
+
+#contenido.d-shared .panel {
+  border: 0; border-top: 1px solid var(--border-strong); border-radius: 0; background: transparent;
+  padding-left: 0; padding-right: 0;
+}
+#contenido.d-shared .confirm { background: var(--bg); }
+#contenido.d-shared .table-wrap { border: 0; border-top: 1px solid var(--border-strong); border-radius: 0; background: transparent; }
+#contenido.d-shared .table th {
+  font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding-top: 14px;
+}
+#contenido.d-shared .table td { padding-top: 16px; padding-bottom: 14px; border-bottom-color: var(--border); }
+#contenido.d-shared .table th:first-child,
+#contenido.d-shared .table td:first-child { padding-left: 0; }
+#contenido.d-shared .table th:last-child,
+#contenido.d-shared .table td:last-child { padding-right: 0; }
+
+#contenido.d-shared .btn { border-radius: 0; min-height: 40px; padding: 0 18px; }
+#contenido.d-shared .btn-sm { min-height: 36px; padding: 0 14px; }
+#contenido.d-shared .btn-icon { padding: 0; }
+#contenido.d-shared .btn-primary { min-height: 44px; border: 0; font-weight: 500; }
+#contenido.d-shared .btn-danger { color: var(--text); font-weight: 600; }
+#contenido.d-shared .input,
+#contenido.d-shared .select,
+#contenido.d-shared .textarea { border-radius: 0; background: transparent; }
+#contenido.d-shared .badge { border: 0; padding: 0; font-style: italic; font-size: 12px; }
+#contenido.d-shared .count-badge { background: transparent; color: var(--text); font-weight: 500; }
+#contenido.d-shared [role='progressbar'] { height: 1px; border-radius: 0; background: var(--border-strong); overflow: visible; }
+#contenido.d-shared [role='progressbar'] > * { height: 2px; margin-top: -0.5px; border-radius: 0; }
+#contenido.d-shared .style,
+#contenido.d-shared .opt { border-radius: 0; background: transparent; }
+#contenido.d-shared .entry { padding-top: 14px; }
+#contenido.d-shared .pname .input:not(:focus):not(:hover) { background: transparent; border-color: transparent; }
+/* Contains the .sr-only (position: absolute) cells of wide tables so they
+   scroll with the table instead of widening the page on phones. */
+#contenido.d-shared .table-wrap { position: relative; }

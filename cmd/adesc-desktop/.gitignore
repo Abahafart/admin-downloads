@@ -1,0 +1,4 @@
+# Salida de wails build y de build/linux/package.sh
+/build/bin/
+/build/dist/
+/build/wailsjs/

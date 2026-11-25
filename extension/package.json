@@ -1,0 +1,9 @@
+{
+  "name": "admindescargas-extension",
+  "private": true,
+  "type": "module",
+  "description": "Extensión MV3 de AdminDescargas (sin paso de build). package.json solo sirve para que Node trate los .js como módulos ES en los tests.",
+  "scripts": {
+    "test": "node --test test/"
+  }
+}
