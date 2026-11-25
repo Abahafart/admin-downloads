@@ -35,18 +35,19 @@ type Connection struct {
 	Mode    Mode   `json:"mode"`
 }
 
-// Webview origins of Wails v2 (sent as Origin by the embedded UI): Linux and
-// macOS serve the assets on wails://wails, Windows (WebView2) on
+// Webview origins of Wails (sent as Origin by the embedded UI): Linux and
+// macOS serve the assets on wails://wails or wails://localhost, Windows (WebView2) on
 // http://wails.localhost. `wails dev` uses http://localhost:34115.
 const (
-	OriginUnix    = "wails://wails"
-	OriginWindows = "http://wails.localhost"
-	OriginDev     = "http://localhost:34115"
+	OriginUnix      = "wails://wails"
+	OriginUnixLocal = "wails://localhost"
+	OriginWindows   = "http://wails.localhost"
+	OriginDev       = "http://localhost:34115"
 )
 
 // WebviewOrigins are the Origin values the API must accept for the desktop
 // UI (all platforms; they cannot be produced by a normal web page).
-func WebviewOrigins() []string { return []string{OriginUnix, OriginWindows} }
+func WebviewOrigins() []string { return []string{OriginUnix, OriginUnixLocal, OriginWindows} }
 
 // ErrDaemonRunning wraps app.ErrAlreadyRunning when another process owns
 // the data directory.
