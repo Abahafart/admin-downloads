@@ -583,7 +583,9 @@ Cada plugin lleva fixtures grabados en `testdata/` para tests offline, y tests e
 
 ### 16.1 Migrar la app de escritorio de Wails v2 a Wails v3
 
-**Estado:** completado.
+**Estado:** código migrado; falta probar la app en ejecución y recuperar el instalador NSIS (sección 16.2).
+
+Verificado en Linux: `go build`, `go vet`, `go test -race` y `golangci-lint` en verde en los dos módulos (escritorio con `-tags desktop,production,gtk3`), `go vet` del escritorio para Windows, y el daemon con `CGO_ENABLED=0` para linux, windows y darwin. **Sin verificar:** la app no se ha arrancado (no había `xvfb` ni permiso para ejecutarla), así que la bandeja, las notificaciones, la instancia única, `adesc://` y el portapapeles bajo v3 solo están compilados; el smoke test del CI y las pruebas manuales de la sección 14 quedan pendientes, igual que Windows y macOS en ejecución.
 
 **Resumen de la migración:**
 - Actualizado a **Wails v3.1.0** (última versión estable compatible con Go 1.27).
@@ -598,3 +600,12 @@ Cada plugin lleva fixtures grabados en `testdata/` para tests offline, y tests e
 - CI actualizado (`.github/workflows/ci.yml`): `WAILS_VERSION: v3.1.0`, tags `gtk3` en Linux en sustitución de `webkit2_41`, paso `Desktop lint` con `golangci-lint` sobre `cmd/adesc-desktop`, y smoke test con `xvfb-run` validado contra `wails://localhost`.
 - Makefile ampliado con los objetivos `make desktop` y `make lint-desktop`.
 - `make deps-update` verificado (mantiene intactos los pins de `gvisor` y `go-retry`).
+
+### 16.2 Instalador de Windows (NSIS) con Wails v3
+
+**Estado:** pendiente.
+
+Con Wails v2, `wails build -nsis -webview2 download` generaba un instalador NSIS que además instalaba el runtime de WebView2 si faltaba. Con la migración a v3, el job `desktop` del CI solo compila `adesc-desktop.exe` con `go build`. Falta:
+- generar el instalador con las herramientas de empaquetado de Wails v3 (`wails3` y las plantillas de `build/windows`), incluido el bootstrap de WebView2 y el registro del esquema `adesc://` (antes venía de `info.protocols` en `wails.json`; ahora está en `wails.yaml`);
+- añadirlo a los artefactos del CI, que hoy solo suben el `.exe`;
+- revisar de paso el icono del `.app` de macOS, que el CI ya no genera (antes lo hacía `wails build`).

@@ -177,9 +177,11 @@ adesc-desktop [--config <config.toml>] [--hidden] [enlaces o adesc://add?url=…
 
 - Logs: `<data_dir>/logs/adesc-desktop.log` (o `log.file`);
   `ADESC_LOG_STDERR=1` los manda a la consola.
-- Tests sin GTK: `go test -tags bindings ./...`; con GTK instalado:
-  `go test -tags desktop,production,gtk3 ./...`. La lógica compartida se
-  prueba desde la raíz: `go test ./internal/desktop/...`.
+- Tests del módulo: `go test -tags desktop,production,gtk3 ./...`. Necesitan
+  GTK 3 y WebKitGTK 4.1 instalados: Wails v3 no tiene un modo sin GTK como el
+  tag `bindings` de v2, y sin el tag `gtk3` intenta compilar contra GTK 4 /
+  WebKitGTK 6.0. La lógica compartida, que no depende de Wails, se prueba sin
+  GTK desde la raíz: `go test ./internal/desktop/...`.
 - Iconos: `go run tools/genicons/main.go` regenera `build/appicon.png` y los de
   la bandeja (`icons/`).
 
