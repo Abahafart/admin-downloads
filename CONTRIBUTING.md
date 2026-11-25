@@ -94,3 +94,22 @@ Node. `make web` overwrites it with the real build; do not commit the built
 files (`make web-placeholder` restores the placeholder from
 `tools/web-placeholder.html`, no git needed, or use
 `git update-index --skip-worktree web/dist/index.html` locally).
+
+## Commits
+
+Commit every change as soon as it is finished and verified; don't wait to be
+asked. This is a standing rule from the project owner.
+
+- One change per commit; don't mix unrelated changes. Write a descriptive
+  message.
+- Before committing, run what the change touches: `go build ./...`,
+  `go vet ./...`, `go test -race ./...` and `golangci-lint run ./...`; for the
+  Web UI, `npm test` in `web/`; for the desktop module, the commands in
+  `cmd/adesc-desktop/README.md`.
+- Commits are local only. Pushing, opening PRs or anything else that leaves
+  the machine needs the owner's confirmation.
+- Never commit secrets or runtime data (`config.toml`, `cookies.txt`, `.env`,
+  `*.db`) nor the built `web/dist` (see above).
+- When several agents work in parallel, each commits only the files of the
+  packages it owns (see "Package ownership"); stage paths explicitly instead
+  of `git add -A`.
