@@ -16,20 +16,120 @@ Hay tres formas de usarlo, todas sobre el mismo núcleo (`internal/app`):
 - **`adesc <comando>`**: la CLI, cliente de esa API;
 - **`adesc-desktop`**: la app de escritorio (Wails), ver [cmd/adesc-desktop/README.md](cmd/adesc-desktop/README.md).
 
-## Requisitos
+## Instalación
 
-- Go 1.27 (el daemon y la CLI se compilan con `CGO_ENABLED=0`).
-- Node 18 o superior y npm para la Web UI (Vite 6; con Node 22 también funciona).
-- Solo para la app de escritorio: cgo, Wails v2 y WebKitGTK 4.1 en Linux.
+No hay binarios publicados todavía: se compila desde el código. Qué hace falta:
+
+| Herramienta | Para qué | Obligatoria |
+|---|---|---|
+| Git | clonar el repositorio | sí |
+| Go **1.27.3 o superior** | daemon, CLI y app de escritorio | sí |
+| Node 18 o superior (recomendado 22 LTS) y npm | compilar la Web UI (Vite 6) | sí, para tener interfaz web |
+| GNU Make | atajos `make …` (se puede compilar sin él, ver abajo) | no |
+| Compilador de C (gcc o clang) | `make test-race` y la app de escritorio en Linux y macOS | solo para eso |
+| GTK 3 y WebKitGTK 4.1 (Linux) | app de escritorio | solo para la app |
+| `tor`, `wl-clipboard`, el cliente de tu VPN | Tor como salida, portapapeles en Wayland, VPN del sistema | no |
+
+El daemon y la CLI no usan cgo (`CGO_ENABLED=0`). WireGuard funciona en espacio
+de usuario, así que no hace falta `wireguard-tools` ni ser root. Los `.zip`,
+`.7z` y `.rar` se extraen sin programas externos.
+
+Las versiones de Go de los repositorios de muchas distribuciones son más
+antiguas que 1.27: si `go version` muestra menos de 1.27.3, instala Go desde
+<https://go.dev/dl/>.
+
+### Linux
+
+1. **Go** (cualquier distribución; cambia `amd64` por `arm64` si hace falta):
+
+   ```sh
+   curl -fLo /tmp/go.tgz https://go.dev/dl/go1.27.4.linux-amd64.tar.gz
+   sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf /tmp/go.tgz
+   echo 'export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin' >> ~/.profile && . ~/.profile
+   go version
+   ```
+
+2. **Herramientas de compilación y Node.** El paquete de escritorio (GTK 3 +
+   WebKitGTK 4.1) solo hace falta para `adesc-desktop`:
+
+   | Distribución | Herramientas, Node y Make | Solo para la app de escritorio |
+   |---|---|---|
+   | Debian 12+, Ubuntu 22.04+, Mint | `sudo apt install git make gcc nodejs npm` | `sudo apt install pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev` |
+   | Fedora | `sudo dnf install git make gcc nodejs npm` | `sudo dnf install pkgconf-pkg-config gtk3-devel webkit2gtk4.1-devel` |
+   | Arch, Manjaro | `sudo pacman -S --needed git make gcc nodejs npm` | `sudo pacman -S --needed pkgconf gtk3 webkit2gtk-4.1` |
+   | openSUSE Tumbleweed / Leap 15.6+ | `sudo zypper install git make gcc nodejs npm` | `sudo zypper install pkg-config gtk3-devel webkit2gtk3-devel` |
+
+   Ubuntu 22.04 trae Node 12, que no sirve: instala Node 22 con
+   [nvm](https://github.com/nvm-sh/nvm) (`nvm install 22`) o desde
+   <https://nodejs.org>. Comprueba con `node --version` que tienes 18 o superior.
+
+3. **Opcional:** `tor` (paquete `tor` en todas) para usar Tor como salida;
+   `wl-clipboard` para detectar enlaces copiados en Wayland sin XWayland. Para
+   guardar las credenciales en el llavero hace falta un servicio Secret Service
+   en marcha (GNOME Keyring o KWallet); sin él se usa el vault cifrado.
+
+### macOS (Intel y Apple Silicon)
+
+```sh
+xcode-select --install        # compilador de C, make y git
+# Homebrew: https://brew.sh
+brew install go node
+go version && node --version
+```
+
+Opcional: `brew install tor`. La app de escritorio usa el WebKit del sistema y
+no necesita nada más. Las credenciales van al Llavero de macOS.
+
+### Windows 10 y 11
+
+En PowerShell:
+
+```powershell
+winget install --id Git.Git
+winget install --id GoLang.Go
+winget install --id OpenJS.NodeJS.LTS
+winget install --id ezwinports.make         # opcional, para usar make
+```
+
+Cierra y vuelve a abrir la terminal para que se actualice el `PATH`.
+
+- Los objetivos de `make` usan sintaxis de shell POSIX: ejecútalos desde **Git
+  Bash** (viene con Git), no desde PowerShell ni `cmd`.
+- La app de escritorio usa WebView2, que ya viene con Windows 11. En Windows 10,
+  si falta: `winget install --id Microsoft.EdgeWebView2Runtime`. No necesita
+  compilador de C.
+- `make test-race` sí necesita cgo y un compilador de C para Windows (por
+  ejemplo, gcc de [MSYS2](https://www.msys2.org/)). Los demás tests no.
+- Las credenciales van al Administrador de credenciales de Windows.
 
 ## Compilar
 
 ```sh
-make web        # compila la Web UI en web/dist (opcional: sin ella se sirve una página provisional)
-make build      # genera bin/adesc (daemon + CLI, sin cgo)
-make cross      # binarios para linux/windows/darwin en amd64 y arm64
-make web-placeholder   # vuelve a dejar la página provisional en web/dist
+git clone https://github.com/Abahafart/admin-downloads.git
+cd admin-downloads
+make all        # = make web + make build: Web UI embebida y bin/adesc (daemon + CLI)
+make desktop    # app de escritorio en cmd/adesc-desktop/build/bin/ (compila también la Web UI)
+make cross      # bin/adesc-<so>-<arq> para linux, windows y darwin en amd64 y arm64
 ```
+
+`make build` sin `make web` antes compila el daemon con una página provisional
+en lugar de la interfaz («La interfaz web no está compilada…»). `make
+web-placeholder` vuelve a dejar esa página en `web/dist`.
+
+**Sin make** (por ejemplo, en PowerShell):
+
+```powershell
+cd web; npm ci; npm run build; cd ..
+$env:CGO_ENABLED = "0"; go build -trimpath -o bin\adesc.exe .\cmd\adesc
+# App de escritorio en Windows (sin ventana de consola):
+go -C cmd/adesc-desktop build -tags desktop,production -ldflags "-s -w -H=windowsgui" -o build/bin/adesc-desktop.exe .
+```
+
+En Linux y macOS, sin make: `cd web && npm ci && npm run build && cd ..`,
+luego `CGO_ENABLED=0 go build -trimpath -o bin/adesc ./cmd/adesc`; la app,
+`go -C cmd/adesc-desktop build -tags desktop,production,gtk3 -o build/bin/adesc-desktop .`
+(el tag `gtk3` solo afecta a Linux). Los paquetes `.deb`, AppImage y `.dmg` se
+generan como se explica en [cmd/adesc-desktop/README.md](cmd/adesc-desktop/README.md).
 
 ## Arrancar el daemon
 
@@ -178,7 +278,8 @@ Con `--url` y `--token` la CLI habla con un daemon de otra máquina.
 ```sh
 make test        # go test ./...
 make test-race   # con el detector de carreras (necesita cgo)
-make lint        # golangci-lint v2
+make lint        # golangci-lint v2.15 (go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.15.0)
+make lint-desktop   # lint de la app de escritorio
 cd web && npm run dev   # Web UI con recarga en caliente (proxy de /api al daemon)
 ```
 
