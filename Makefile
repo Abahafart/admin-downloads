@@ -33,7 +33,8 @@ build:
 	CGO_ENABLED=0 go build $(GOFLAGS) -ldflags '$(LDFLAGS)' -o bin/$(BINARY) ./cmd/adesc
 
 ## desktop: app de escritorio (Wails v3) con GTK 3 y WebKitGTK 4.1
-desktop:
+## desktop: app de escritorio con la Web UI compilada (make web) embebida
+desktop: web
 	mkdir -p cmd/adesc-desktop/build/bin
 	go -C cmd/adesc-desktop build -tags desktop,production,gtk3 -o build/bin/adesc-desktop .
 
