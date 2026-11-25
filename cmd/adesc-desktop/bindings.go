@@ -6,8 +6,6 @@ import (
 	"errors"
 	"time"
 
-	wruntime "github.com/wailsapp/wails/v2/pkg/runtime"
-
 	"admindescargas/internal/config"
 	"admindescargas/internal/desktop"
 )
@@ -93,9 +91,3 @@ func (b *Bindings) HideWindow() { b.d.hideWindow() }
 
 // Quit exits the app (stopping the integrated core).
 func (b *Bindings) Quit() { go b.d.quit() }
-
-func (d *desktopApp) hideWindow() {
-	if d.ctx != nil {
-		wruntime.WindowHide(d.ctx)
-	}
-}

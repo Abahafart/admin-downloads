@@ -1,5 +1,5 @@
 // Command adesc-desktop is the AdminDescargas desktop app (PLAN.md section
-// 8): a Wails v2 window with the same Svelte UI as the daemon, a tray icon,
+// 8): a Wails v3 window with the same Svelte UI as the daemon, a tray icon,
 // system notifications, native dialogs, the clipboard monitor, autostart,
 // single instance and the adesc:// URL scheme.
 //
@@ -27,12 +27,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/wailsapp/wails/v2"
-	"github.com/wailsapp/wails/v2/pkg/options"
-	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
-	"github.com/wailsapp/wails/v2/pkg/options/linux"
-	"github.com/wailsapp/wails/v2/pkg/options/mac"
-	"github.com/wailsapp/wails/v2/pkg/options/windows"
+	"github.com/wailsapp/wails/v3/pkg/application"
+	"github.com/wailsapp/wails/v3/pkg/events"
+	wnotify "github.com/wailsapp/wails/v3/pkg/services/notifications"
 
 	"admindescargas/internal/app"
 	"admindescargas/internal/buildinfo"
@@ -126,48 +123,74 @@ func run(argv []string) int {
 		log.Error("config", "err", cfgErr)
 	}
 
-	bg := d.initialBackground()
-	err := wails.Run(&options.App{
-		Title:     "AdminDescargas",
-		Width:     1200,
-		Height:    780,
-		MinWidth:  720,
-		MinHeight: 480,
-		// --hidden (autostart) or [desktop].start_hidden: tray only.
-		StartHidden:       args.hidden || cfg.Desktop.StartHidden,
-		HideWindowOnClose: d.closeToTray,
-		BackgroundColour:  &options.RGBA{R: bg.R, G: bg.G, B: bg.B, A: 255},
-		AssetServer:       &assetserver.Options{Handler: d.assetHandler()},
-		OnStartup:         d.startup,
-		OnDomReady:        d.domReady,
-		OnBeforeClose:     d.beforeClose,
-		OnShutdown:        d.shutdown,
-		Bind:              []any{&Bindings{d: d}},
-		SingleInstanceLock: &options.SingleInstanceLock{
-			UniqueId:               singleInstanceID(cfg.DataDir),
+	ns := wnotify.New()
+	d.notify.svc = ns
+
+	wApp := application.New(application.Options{
+		Name:        "AdminDescargas",
+		Description: "Gestor de descargas multi-hoster.",
+		Icon:        appIcon,
+		Logger:      baseLog,
+		Assets: application.AssetOptions{
+			Handler: d.assetHandler(),
+		},
+		Services: []application.Service{
+			application.NewService(ns),
+			application.NewService(&Bindings{d: d}),
+		},
+		SingleInstance: &application.SingleInstanceOptions{
+			UniqueID:               singleInstanceID(cfg.DataDir),
 			OnSecondInstanceLaunch: d.onSecondInstance,
 		},
-		// Pasting links needs the native context menu.
-		EnableDefaultContextMenu: true,
-		Logger:                   wailsLogger{log},
-		Windows: &windows.Options{
-			Theme: windowsTheme(d.appearance),
-		},
-		Mac: &mac.Options{
-			OnUrlOpen: d.onURLOpen,
-			About: &mac.AboutInfo{
-				Title:   "AdminDescargas " + buildinfo.Version,
-				Message: "Gestor de descargas multi-hoster.",
-				Icon:    appIcon,
-			},
-		},
-		Linux: &linux.Options{
-			Icon:             appIcon,
-			ProgramName:      "adesc-desktop",
-			WebviewGpuPolicy: linux.WebviewGpuPolicyOnDemand,
+		OnShutdown: d.shutdown,
+		Mac: application.MacOptions{
+			ApplicationShouldTerminateAfterLastWindowClosed: false,
 		},
 	})
-	if err != nil {
+	d.wailsApp = wApp
+
+	bg := d.initialBackground()
+	window := wApp.Window.NewWithOptions(application.WebviewWindowOptions{
+		Title:                      "AdminDescargas",
+		Width:                      1200,
+		Height:                     780,
+		MinWidth:                   720,
+		MinHeight:                  480,
+		Hidden:                     args.hidden || cfg.Desktop.StartHidden,
+		BackgroundColour:           application.RGBA{Red: bg.R, Green: bg.G, Blue: bg.B, Alpha: 255},
+		URL:                        "/",
+		DefaultContextMenuDisabled: false,
+		Windows: application.WindowsWindow{
+			Theme: windowsTheme(d.appearance),
+		},
+		Mac: application.MacWindow{
+			InvisibleTitleBarHeight: 0,
+		},
+		Linux: application.LinuxWindow{
+			Icon:             appIcon,
+			WebviewGpuPolicy: application.WebviewGpuPolicyOnDemand,
+		},
+	})
+	d.window = window
+
+	window.RegisterHook(events.Common.WindowClosing, func(e *application.WindowEvent) {
+		if d.closeToTray && !d.quitting.Load() {
+			window.Hide()
+			e.Cancel()
+		}
+	})
+
+	wApp.Event.OnApplicationEvent(events.Common.ApplicationStarted, func(*application.ApplicationEvent) {
+		d.startup()
+	})
+	wApp.Event.OnApplicationEvent(events.Common.ApplicationLaunchedWithUrl, func(e *application.ApplicationEvent) {
+		d.onURLOpen(e.Context().URL())
+	})
+	wApp.Event.OnApplicationEvent(events.Mac.ApplicationShouldHandleReopen, func(*application.ApplicationEvent) {
+		d.showWindow()
+	})
+
+	if err := wApp.Run(); err != nil {
 		log.Error("wails", "err", err)
 		fmt.Fprintln(os.Stderr, "adesc-desktop:", err)
 		return 1
@@ -202,24 +225,13 @@ func newLogger(cfg *config.Config) *slog.Logger {
 	return l
 }
 
-func windowsTheme(a desktop.Appearance) windows.Theme {
+func windowsTheme(a desktop.Appearance) application.Theme {
 	switch a.Tema {
 	case desktop.TemaOscuro:
-		return windows.Dark
+		return application.Dark
 	case desktop.TemaClaro:
-		return windows.Light
+		return application.Light
 	default:
-		return windows.SystemDefault
+		return application.SystemDefault
 	}
 }
-
-// wailsLogger forwards Wails' own logs to slog.
-type wailsLogger struct{ l *slog.Logger }
-
-func (w wailsLogger) Print(m string)   { w.l.Info(m, "src", "wails") }
-func (w wailsLogger) Trace(m string)   { w.l.Debug(m, "src", "wails") }
-func (w wailsLogger) Debug(m string)   { w.l.Debug(m, "src", "wails") }
-func (w wailsLogger) Info(m string)    { w.l.Info(m, "src", "wails") }
-func (w wailsLogger) Warning(m string) { w.l.Warn(m, "src", "wails") }
-func (w wailsLogger) Error(m string)   { w.l.Error(m, "src", "wails") }
-func (w wailsLogger) Fatal(m string)   { w.l.Error(m, "src", "wails", "fatal", true) }

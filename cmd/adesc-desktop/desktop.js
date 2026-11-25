@@ -5,7 +5,36 @@
 (function () {
   'use strict';
   if (window.__adescDesktop) return;
-  window.__adescDesktop = { version: 1 };
+  window.__adescDesktop = { version: 2 };
+
+  // Compatibility bridge: web/src/lib/store/app.svelte.ts listens for
+  // window.runtime.EventsOn('adesc:navigate', ...).
+  if (!window.runtime) window.runtime = {};
+  if (!window.runtime.EventsOn) {
+    var listeners = {};
+    window.runtime.EventsOn = function (name, cb) {
+      if (!listeners[name]) listeners[name] = [];
+      listeners[name].push(cb);
+    };
+    window.__adescNavigate = function (screen) {
+      var cbs = listeners['adesc:navigate'];
+      if (cbs) {
+        for (var i = 0; i < cbs.length; i++) cbs[i](screen);
+      }
+    };
+    import('/wails/runtime.js').then(function (wails) {
+      if (wails && wails.Events && wails.Events.On) {
+        for (var name in listeners) {
+          (function (n, cbs) {
+            wails.Events.On(n, function (ev) {
+              var val = ev && ev.data !== undefined ? ev.data : ev;
+              for (var j = 0; j < cbs.length; j++) cbs[j](val);
+            });
+          })(name, listeners[name]);
+        }
+      }
+    }).catch(function () {});
+  }
 
   var MAX_FILE = 4 * 1024 * 1024;
 

@@ -85,7 +85,7 @@ func testApp(t *testing.T) *desktopApp {
 		ready:   make(chan struct{}),
 	}
 	d.tray = &trayUI{d: d}
-	d.notify = &notifications{d: d}
+	d.notify = &desktopNotifications{d: d}
 	return d
 }
 

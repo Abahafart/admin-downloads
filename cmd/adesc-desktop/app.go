@@ -9,8 +9,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/wailsapp/wails/v2/pkg/options"
-	wruntime "github.com/wailsapp/wails/v2/pkg/runtime"
+	"github.com/wailsapp/wails/v3/pkg/application"
 
 	"admindescargas/internal/app"
 	"admindescargas/internal/config"
@@ -35,7 +34,9 @@ type desktopApp struct {
 	cfgMu sync.Mutex
 	cfg   *config.Config
 
-	ctx    context.Context // Wails runtime context, valid after startup
+	wailsApp *application.App
+	window   *application.WebviewWindow
+
 	bg     context.Context // background work, canceled in shutdown
 	cancel context.CancelFunc
 
@@ -54,7 +55,7 @@ type desktopApp struct {
 	clipErr    error
 
 	tray     *trayUI
-	notify   *notifications
+	notify   *desktopNotifications
 	quitting atomic.Bool
 }
 
@@ -79,7 +80,7 @@ func newDesktopApp(cfgPath string, cfg *config.Config, log *slog.Logger, args cl
 	if len(args.links) > 0 || args.text != "" {
 		d.pending = append(d.pending, pendingLinks{args.links, args.text, "desktop"})
 	}
-	d.notify = &notifications{d: d}
+	d.notify = &desktopNotifications{d: d}
 	d.tray = &trayUI{d: d}
 	return d
 }
@@ -117,8 +118,7 @@ func (d *desktopApp) initialBackground() desktop.RGB {
 
 // --- Wails lifecycle ---------------------------------------------------
 
-func (d *desktopApp) startup(ctx context.Context) {
-	d.ctx = ctx
+func (d *desktopApp) startup() {
 	d.bg, d.cancel = context.WithCancel(context.Background())
 	// Always initialized: the clipboard prompt uses notifications even when
 	// download notifications are off.
@@ -132,13 +132,7 @@ func (d *desktopApp) startup(ctx context.Context) {
 	}
 }
 
-func (d *desktopApp) domReady(context.Context) {}
-
-// beforeClose runs on quit (window close without tray, tray "Salir",
-// Cmd+Q): never prevent it.
-func (d *desktopApp) beforeClose(context.Context) bool { return false }
-
-func (d *desktopApp) shutdown(context.Context) {
+func (d *desktopApp) shutdown() {
 	d.quitting.Store(true)
 	if d.cancel != nil {
 		d.cancel()
@@ -161,7 +155,7 @@ func (d *desktopApp) shutdown(context.Context) {
 
 // onSecondInstance receives the arguments of a second launch (links,
 // adesc:// URLs) and focuses the window.
-func (d *desktopApp) onSecondInstance(data options.SecondInstanceData) {
+func (d *desktopApp) onSecondInstance(data application.SecondInstanceData) {
 	a := parseArgs(data.Args)
 	if len(a.links) > 0 || a.text != "" {
 		d.addLinks(a.links, a.text, "desktop")
@@ -172,7 +166,7 @@ func (d *desktopApp) onSecondInstance(data options.SecondInstanceData) {
 	d.showWindow()
 }
 
-// onURLOpen handles adesc:// URLs on macOS (Apple events, not argv).
+// onURLOpen handles adesc:// URLs on macOS and other platforms.
 func (d *desktopApp) onURLOpen(raw string) {
 	links, text, ok := desktop.ParseSchemeURL(raw)
 	if !ok {
@@ -187,24 +181,32 @@ func (d *desktopApp) onURLOpen(raw string) {
 // --- window helpers ----------------------------------------------------
 
 func (d *desktopApp) showWindow() {
-	if d.ctx == nil {
-		return
+	if d.window != nil {
+		d.window.Show()
+		d.window.Focus()
 	}
-	wruntime.WindowShow(d.ctx)
-	wruntime.WindowUnminimise(d.ctx)
+}
+
+func (d *desktopApp) hideWindow() {
+	if d.window != nil {
+		d.window.Hide()
+	}
 }
 
 func (d *desktopApp) quit() {
 	d.quitting.Store(true)
-	if d.ctx != nil {
-		wruntime.Quit(d.ctx)
+	if d.wailsApp != nil {
+		d.wailsApp.Quit()
 	}
 }
 
 // navigate asks the UI to show a screen (Wails event "adesc:navigate").
 func (d *desktopApp) navigate(screen string) {
-	if d.ctx != nil {
-		wruntime.EventsEmit(d.ctx, "adesc:navigate", screen)
+	if d.wailsApp != nil {
+		d.wailsApp.Event.Emit("adesc:navigate", screen)
+	}
+	if d.window != nil {
+		d.window.ExecJS(fmt.Sprintf(`if (window.__adescNavigate) window.__adescNavigate(%q);`, screen))
 	}
 }
 
@@ -316,8 +318,8 @@ func (d *desktopApp) reconnect() {
 		cancel()
 	}
 	d.establish()
-	if d.ctx != nil {
-		wruntime.WindowReloadApp(d.ctx)
+	if d.window != nil {
+		d.window.Reload()
 	}
 }
 
@@ -573,17 +575,9 @@ func (d *desktopApp) applyAppearance(a desktop.Appearance, esquema string) {
 	changed := d.appearance != a
 	d.appearance = a
 	d.mu.Unlock()
-	if d.ctx != nil {
+	if d.window != nil {
 		c := a.Background(dark)
-		wruntime.WindowSetBackgroundColour(d.ctx, c.R, c.G, c.B, 255)
-		switch a.Tema {
-		case desktop.TemaOscuro:
-			wruntime.WindowSetDarkTheme(d.ctx)
-		case desktop.TemaClaro:
-			wruntime.WindowSetLightTheme(d.ctx)
-		default:
-			wruntime.WindowSetSystemDefaultTheme(d.ctx)
-		}
+		d.window.SetBackgroundColour(application.RGBA{Red: c.R, Green: c.G, Blue: c.B, Alpha: 255})
 	}
 	if changed {
 		if err := desktop.SaveState(d.config().DataDir, desktop.State{Appearance: a}); err != nil {

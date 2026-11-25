@@ -12,8 +12,6 @@ import (
 	"strings"
 	"time"
 
-	wruntime "github.com/wailsapp/wails/v2/pkg/runtime"
-
 	"admindescargas/internal/buildinfo"
 	"admindescargas/internal/config"
 	"admindescargas/internal/desktop"
@@ -26,50 +24,64 @@ var errCancelled = errors.New("cancelado")
 // cookies.txt) and drag & drop.
 const maxImportFile = 4 << 20
 
-// askYesNo shows a native question. Windows and Linux only have the
-// standard Yes/No buttons (localized by the OS); macOS gets "Sí"/"No".
+// askYesNo shows a native question dialog.
 func (d *desktopApp) askYesNo(title, msg string) bool {
-	if d.ctx == nil {
+	if d.wailsApp == nil {
 		return false
 	}
-	opts := wruntime.MessageDialogOptions{Type: wruntime.QuestionDialog, Title: title, Message: msg}
-	if goruntime.GOOS == "darwin" {
-		opts.Buttons = []string{"Sí", "No"}
-		opts.DefaultButton = "Sí"
-		opts.CancelButton = "No"
+	ch := make(chan bool, 1)
+	q := d.wailsApp.Dialog.Question().SetTitle(title).SetMessage(msg)
+	if d.window != nil {
+		q.AttachToWindow(d.window)
 	}
-	res, err := wruntime.MessageDialog(d.ctx, opts)
-	if err != nil {
-		d.log.Warn("dialog", "err", err)
+	q.AddButton("Sí").SetAsDefault().OnClick(func() {
+		select {
+		case ch <- true:
+		default:
+		}
+	})
+	q.AddButton("No").SetAsCancel().OnClick(func() {
+		select {
+		case ch <- false:
+		default:
+		}
+	})
+	q.Show()
+	select {
+	case yes := <-ch:
+		return yes
+	case <-time.After(5 * time.Minute):
 		return false
 	}
-	switch strings.ToLower(res) {
-	case "yes", "sí", "si", "ok":
-		return true
-	}
-	return false
 }
 
 func (d *desktopApp) showError(title, msg string) {
-	if d.ctx == nil {
+	if d.wailsApp == nil {
 		return
 	}
-	if _, err := wruntime.MessageDialog(d.ctx, wruntime.MessageDialogOptions{Type: wruntime.ErrorDialog, Title: title, Message: msg}); err != nil {
-		d.log.Warn("dialog", "err", err)
+	errDlg := d.wailsApp.Dialog.Error().SetTitle(title).SetMessage(msg)
+	if d.window != nil {
+		errDlg.AttachToWindow(d.window)
 	}
+	errDlg.Show()
 }
 
 // pickDownloadFolder opens the native folder chooser at the current
 // download folder. The UI saves the result through PUT /api/v1/settings.
 func (d *desktopApp) pickDownloadFolder() (string, error) {
-	if d.ctx == nil {
-		return "", errors.New("la ventana no está lista")
+	if d.wailsApp == nil {
+		return "", errors.New("la aplicación no está lista")
 	}
-	dir, err := wruntime.OpenDirectoryDialog(d.ctx, wruntime.OpenDialogOptions{
-		Title:                "Carpeta de descargas",
-		DefaultDirectory:     d.config().DownloadDir,
-		CanCreateDirectories: true,
-	})
+	dlg := d.wailsApp.Dialog.OpenFile().
+		CanChooseDirectories(true).
+		CanChooseFiles(false).
+		CanCreateDirectories(true).
+		SetTitle("Carpeta de descargas").
+		SetDirectory(d.config().DownloadDir)
+	if d.window != nil {
+		dlg.AttachToWindow(d.window)
+	}
+	dir, err := dlg.PromptForSingleSelection()
 	if err != nil {
 		return "", err
 	}
@@ -91,27 +103,35 @@ const (
 // importFile asks for a file and posts it to the matching API endpoint.
 // hoster and label apply to cookies. It returns the API's JSON answer.
 func (d *desktopApp) importFile(ctx context.Context, kind importKind, hoster, label string) (json.RawMessage, error) {
-	if d.ctx == nil {
-		return nil, errors.New("la ventana no está lista")
+	if d.wailsApp == nil {
+		return nil, errors.New("la aplicación no está lista")
 	}
-	var opts wruntime.OpenDialogOptions
+	dlg := d.wailsApp.Dialog.OpenFile().
+		CanChooseFiles(true).
+		CanChooseDirectories(false)
+	if d.window != nil {
+		dlg.AttachToWindow(d.window)
+	}
 	switch kind {
 	case importProxies:
-		opts = wruntime.OpenDialogOptions{Title: "Importar lista de proxies", Filters: []wruntime.FileFilter{
-			{DisplayName: "Listas de proxies (*.txt, *.list)", Pattern: "*.txt;*.list"}, {DisplayName: "Todos los archivos", Pattern: "*"}}}
+		dlg.SetTitle("Importar lista de proxies").
+			AddFilter("Listas de proxies (*.txt, *.list)", "*.txt;*.list").
+			AddFilter("Todos los archivos", "*")
 	case importWireGuard:
-		opts = wruntime.OpenDialogOptions{Title: "Importar configuración de WireGuard", Filters: []wruntime.FileFilter{
-			{DisplayName: "WireGuard (*.conf)", Pattern: "*.conf"}, {DisplayName: "Todos los archivos", Pattern: "*"}}}
+		dlg.SetTitle("Importar configuración de WireGuard").
+			AddFilter("WireGuard (*.conf)", "*.conf").
+			AddFilter("Todos los archivos", "*")
 	case importCookies:
 		if strings.TrimSpace(hoster) == "" {
 			return nil, errors.New("falta el hoster de las cookies")
 		}
-		opts = wruntime.OpenDialogOptions{Title: "Importar cookies.txt", Filters: []wruntime.FileFilter{
-			{DisplayName: "Cookies (*.txt, *.json)", Pattern: "*.txt;*.json"}, {DisplayName: "Todos los archivos", Pattern: "*"}}}
+		dlg.SetTitle("Importar cookies.txt").
+			AddFilter("Cookies (*.txt, *.json)", "*.txt;*.json").
+			AddFilter("Todos los archivos", "*")
 	default:
 		return nil, fmt.Errorf("importación desconocida %q", kind)
 	}
-	path, err := wruntime.OpenFileDialog(d.ctx, opts)
+	path, err := dlg.PromptForSingleSelection()
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +167,7 @@ func (d *desktopApp) postImport(ctx context.Context, kind importKind, name, text
 }
 
 func readSmallFile(path string) (string, error) {
-	f, err := os.Open(path)
+	f, err := os.Open(filepath.Clean(path)) //nolint:gosec // G703: path is selected via native file dialog
 	if err != nil {
 		return "", err
 	}

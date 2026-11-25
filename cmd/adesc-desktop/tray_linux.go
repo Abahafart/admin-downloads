@@ -5,7 +5,6 @@ package main
 import (
 	"sync"
 
-	"fyne.io/systray"
 	"github.com/godbus/dbus/v5"
 )
 
@@ -17,13 +16,8 @@ var trayAvailable = sync.OnceValue(func() bool {
 	if err != nil {
 		return false
 	}
+	defer conn.Close()
 	var has bool
 	err = conn.BusObject().Call("org.freedesktop.DBus.NameHasOwner", 0, "org.kde.StatusNotifierWatcher").Store(&has)
 	return err == nil && has
 })
-
-// runTray starts the systray D-Bus loop in its own goroutine.
-func runTray(onReady, onExit func()) (stop func()) {
-	go systray.Run(onReady, onExit)
-	return systray.Quit
-}

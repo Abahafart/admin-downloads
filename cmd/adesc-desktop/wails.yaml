@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://v3.wails.io/schemas/wails.v3.json
+version: 3
+project:
+  icon: build/appicon.png
+  name: AdminDescargas
+  product_name: AdminDescargas
+  identifier: io.admindescargas.desktop
+  version: 0.1.0
+  description: Gestor de descargas multi-hoster
+frontend:
+  dir: ../../web
+protocols:
+  adesc:
+    description: Añadir enlaces a AdminDescargas
