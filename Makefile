@@ -14,7 +14,7 @@ GOFLAGS  := -trimpath
 
 PLATFORMS := linux/amd64 linux/arm64 windows/amd64 windows/arm64 darwin/amd64 darwin/arm64
 
-.PHONY: all web web-placeholder build test test-race live lint vet fmt tidy deps-update cross clean
+.PHONY: all web web-placeholder build desktop test test-race live lint lint-desktop vet fmt tidy deps-update cross clean
 
 all: web build
 
@@ -32,6 +32,11 @@ web-placeholder:
 build:
 	CGO_ENABLED=0 go build $(GOFLAGS) -ldflags '$(LDFLAGS)' -o bin/$(BINARY) ./cmd/adesc
 
+## desktop: app de escritorio (Wails v3) con GTK 3 y WebKitGTK 4.1
+desktop:
+	mkdir -p cmd/adesc-desktop/build/bin
+	go -C cmd/adesc-desktop build -tags desktop,production,gtk3 -o build/bin/adesc-desktop .
+
 test:
 	go test ./...
 
@@ -47,6 +52,9 @@ vet:
 
 lint:
 	golangci-lint run ./...
+
+lint-desktop:
+	cd cmd/adesc-desktop && golangci-lint run --build-tags desktop,production,gtk3 ./...
 
 fmt:
 	gofmt -w cmd internal web/embed.go
