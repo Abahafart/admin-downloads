@@ -328,10 +328,9 @@ Cada plugin lleva fixtures grabados en `testdata/` para tests offline, y tests e
 
 ## 8. Versión de escritorio (`adesc-desktop`)
 
-- **Tecnología:** Wails, que usa el webview del sistema (WebView2 en Windows, WebKit en macOS y WebKitGTK en Linux) y reutiliza tal cual la interfaz Svelte de `web/`.
-  - Se prefiere **Wails v3**, porque trae de serie bandeja del sistema, notificaciones, varias ventanas e instancia única.
-  - Al empezar la fase de escritorio se comprueba si v3 ya tiene versión estable. Si no, el plan B es Wails v2 con `fyne.io/systray` para la bandeja y `gen2brain/beeep` para las notificaciones.
-  - **Estado:** se implementó el plan B (Wails v2, hoy v2.17.1) porque v3 exigía Go ≥ 1.25 y el proyecto usaba Go 1.24. La migración a v3 está pendiente: ver sección 16.1.
+- **Tecnología:** Wails v3 (v3.1.0), que usa el webview del sistema (WebView2 en Windows, WebKit en macOS y WebKitGTK en Linux con GTK 3 vía tag `gtk3`) y reutiliza tal cual la interfaz Svelte de `web/`.
+  - Trae de serie bandeja del sistema nativa, notificaciones con `NotificationService`, diálogos nativos, instancia única (`SingleInstanceOptions`) y esquema de URL `adesc://`.
+  - **Estado:** migrado a Wails v3.1.0 (ver sección 16.1). Se retiraron `fyne.io/systray` y los bucles manuales de AppKit en macOS.
 - **Dos modos:**
   - **Integrado (por defecto):** la app arranca el núcleo dentro de su propio proceso con `internal/app`, igual que el daemon. También levanta la API en `127.0.0.1`, así que la CLI y la extensión del navegador funcionan mientras la app está abierta.
   - **Cliente remoto:** se conecta por URL y token a un `adesc daemon` de otra máquina, como un servidor o un NAS, sin arrancar un núcleo local.
@@ -518,7 +517,7 @@ Cada plugin lleva fixtures grabados en `testdata/` para tests offline, y tests e
 | Extracción | `bodgit/sevenzip`, `nwaples/rardecode/v2` |
 | Tests | `things-go/go-socks5`, para levantar proxies falsos |
 | Frontend | Svelte 5, Vite, TypeScript; fuentes locales (Fontsource): Inter, JetBrains Mono, DM Sans, Geist, Geist Mono y Manrope |
-| Escritorio | `wailsapp/wails` (v3; plan B: v2 con `fyne.io/systray` y `gen2brain/beeep`), `emersion/go-autostart`, `gofrs/flock` |
+| Escritorio | `github.com/wailsapp/wails/v3` (v3.1.0), `emersion/go-autostart`, `gofrs/flock` |
 | Portapapeles | `golang.design/x/clipboard`; `wl-paste` (`wl-clipboard`) en Wayland sin XWayland |
 
 ## 14. Verificación
@@ -584,33 +583,18 @@ Cada plugin lleva fixtures grabados en `testdata/` para tests offline, y tests e
 
 ### 16.1 Migrar la app de escritorio de Wails v2 a Wails v3
 
-**Estado:** pendiente, para que lo tome otro agente.
+**Estado:** completado.
 
-**Por qué ahora:** la app se hizo con Wails v2 (plan B de la sección 8) porque todas las versiones de v3 exigían Go ≥ 1.25. El proyecto ya usa Go 1.27 (`go 1.27.3` en los dos `go.mod`), así que ese bloqueo desapareció. v3 trae de serie lo que con v2 se cubrió con piezas aparte.
-
-**Situación actual (punto de partida):**
-- Módulo aparte `cmd/adesc-desktop` (`replace admindescargas => ../..`), con Wails v2.17.1 y build tags `desktop,production,webkit2_41`. Su `README.md` explica la arquitectura y qué cubre cada pieza.
-- Bandeja con `fyne.io/systray` (`tray*.go`, con un bucle propio en el hilo principal de AppKit en macOS: `mainthread_darwin.go`, `tray_darwin.go`).
-- Notificaciones con `runtime.SendNotification*` de Wails v2 (`notifications.go`).
-- Instancia única con `options.SingleInstanceLock`; `adesc://` por argumentos o `mac.Options.OnUrlOpen`.
-- Monitor del portapapeles en `internal/desktop/clipboard` (`golang.design/x/clipboard` y `wl-paste`).
-- La lógica que no depende de Wails vive en `internal/desktop` y se prueba con el resto del proyecto (`go test ./...`). Los tests del módulo de escritorio corren con `-tags bindings` sin GTK, o con `-tags desktop,production,webkit2_41` con GTK.
-- La interfaz habla con la API por HTTP/SSE; el único binding es `Connection()`. Orígenes aceptados por la API para el webview: `wails://wails`, `http://wails.localhost`, `http://localhost:34115` (`app.WithExtraOrigins`). Con v3 cambian; hay que actualizarlos y sus tests.
-
-**Qué hacer:**
-1. Comprobar la última versión estable de Wails v3 y su versión mínima de Go.
-2. Portar `cmd/adesc-desktop` a la API de v3 (`application.New`, ventanas, servicios en lugar de bindings, eventos):
-   - bandeja con la bandeja nativa de v3, quitando `fyne.io/systray` y el bucle de AppKit propio si ya no hace falta;
-   - notificaciones con el servicio de notificaciones de v3, manteniendo los botones «Añadir» / «Ignorar»;
-   - instancia única y `adesc://` con lo que trae v3;
-   - diálogos nativos, arrastrar y soltar, autoarranque, ocultar a la bandeja al cerrar y `--hidden`;
-   - si v3 ofrece eventos de portapapeles suficientes, valorar usarlos (sección 9.2); si no, se queda `internal/desktop/clipboard`.
-3. Valorar si el módulo aparte sigue siendo necesario. Se creó para que el `go.mod` raíz no dependiera de Wails ni de cgo; si se integra en el raíz, `go build ./...` y `CGO_ENABLED=0` del daemon tienen que seguir funcionando (build tags).
-4. Actualizar los orígenes del webview en la API, el build (`wails.json` o el `Taskfile` de v3, NSIS, `.dmg`, AppImage, `.deb`, registro de `adesc://`), el job `desktop` del CI (`WAILS_VERSION`, comandos de build y el smoke test con `xvfb-run`), `make deps-update` y la documentación (`cmd/adesc-desktop/README.md`, `CONTRIBUTING.md`, secciones 8 y 13 de este plan).
-5. Añadir golangci-lint del módulo de escritorio al CI, que hoy solo lintea el módulo raíz.
-
-**Criterios de aceptación:**
-- `go build`, `go vet`, `go test -race` y `golangci-lint run` en verde en los dos módulos (o en el único, si se fusionan); el daemon sigue compilando con `CGO_ENABLED=0` para linux, windows y darwin.
-- La app compila y arranca en Linux; el smoke test con `xvfb-run` pasa (la API integrada responde y la app se cierra limpia).
-- Se mantienen todas las funciones nativas de la sección 8 y el monitor del portapapeles de la sección 9.2, y las pruebas manuales de escritorio de la sección 14.
-- Windows y macOS: como mínimo, el job de CI compila en los tres sistemas; las pruebas manuales en esos sistemas quedan anotadas si no se pueden hacer.
+**Resumen de la migración:**
+- Actualizado a **Wails v3.1.0** (última versión estable compatible con Go 1.27).
+- Se mantiene el módulo separado `cmd/adesc-desktop` para aislar cgo y dependencias nativas del módulo raíz, garantizando que `go build ./...` y el daemon sigan compilando con `CGO_ENABLED=0` para linux, windows y darwin.
+- Bandeja del sistema migrada a la API nativa de Wails v3 (`app.SystemTray.New()` y `app.NewMenu()`). Eliminada la dependencia externa `fyne.io/systray` y los bucles manuales de AppKit en macOS. En Linux se conserva la detección D-Bus de `StatusNotifierWatcher`.
+- Notificaciones migradas al servicio nativo `github.com/wailsapp/wails/v3/pkg/services/notifications` (`NotificationService`), conservando las acciones interactivas («Añadir» / «Ignorar») y callbacks de clics.
+- Diálogos migrados a la API nativa `app.Dialog` (`OpenFile()`, `Question()`, `Error()`).
+- Instancia única gestionada por `application.SingleInstanceOptions` en `application.New()`, reenviando URLs y argumentos y activando la ventana principal.
+- Esquema `adesc://` manejado mediante `events.Common.ApplicationLaunchedWithUrl` y `events.Mac.ApplicationShouldHandleReopen`. Configuración declarativa en `wails.yaml`.
+- Ocultar a la bandeja al cerrar mediante hook nativo `events.Common.WindowClosing`.
+- Puente webview actualizado: soporte de orígenes `wails://localhost`, `wails://wails` y `http://wails.localhost` en `internal/desktop/connect.go`; eventos y navegación sincronizados en `desktop.js`.
+- CI actualizado (`.github/workflows/ci.yml`): `WAILS_VERSION: v3.1.0`, tags `gtk3` en Linux en sustitución de `webkit2_41`, paso `Desktop lint` con `golangci-lint` sobre `cmd/adesc-desktop`, y smoke test con `xvfb-run` validado contra `wails://localhost`.
+- Makefile ampliado con los objetivos `make desktop` y `make lint-desktop`.
+- `make deps-update` verificado (mantiene intactos los pins de `gvisor` y `go-retry`).

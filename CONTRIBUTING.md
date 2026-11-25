@@ -104,8 +104,8 @@ asked. This is a standing rule from the project owner.
   message.
 - Before committing, run what the change touches: `go build ./...`,
   `go vet ./...`, `go test -race ./...` and `golangci-lint run ./...`; for the
-  Web UI, `npm test` in `web/`; for the desktop module, the commands in
-  `cmd/adesc-desktop/README.md`.
+  Web UI, `npm test` in `web/`; for the desktop module, `make desktop`,
+  `make lint-desktop` and the test commands in `cmd/adesc-desktop/README.md`.
 - Commits are local only. Pushing, opening PRs or anything else that leaves
   the machine needs the owner's confirmation.
 - Never commit secrets or runtime data (`config.toml`, `cookies.txt`, `.env`,

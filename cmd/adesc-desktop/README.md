@@ -13,24 +13,21 @@ eventos SSE, notificaciones, `adesc://`, tema, autoarranque) e
 `internal/desktop/clipboard` (monitor del portapapeles), y se prueba con el
 resto del proyecto.
 
-## Versión de Wails: v2.17.1 (plan B)
+## Versión de Wails: v3.1.0
 
-La app se escribió con Wails v2 porque, cuando el proyecto usaba Go 1.24,
-todas las versiones de Wails v3 (y v2 ≥ 2.13) exigían Go ≥ 1.25. Con Go 1.27
-ya se podría migrar a v3; mientras tanto se usa **Wails v2.17.1**, la última
-v2. Lo que v2 no trae se cubre así:
+La app de escritorio está migrada a **Wails v3.1.0**. Aprovecha las capacidades
+nativas de la API v3:
 
-| Función | Implementación |
+| Función | Implementación en Wails v3 |
 |---|---|
-| Bandeja | `fyne.io/systray` v1.12.2 (D-Bus StatusNotifierItem en Linux; hilo propio en Windows; bucle externo en el hilo principal de AppKit en macOS) |
-| Notificaciones | las de Wails v2 (`runtime.SendNotification*`), con botones «Añadir» / «Ignorar». No hace falta `gen2brain/beeep` |
-| Instancia única | `options.SingleInstanceLock` de Wails (reenvía los argumentos) |
-| `adesc://` | Windows y Linux: el sistema lanza la app con la URL como argumento y la instancia única la reenvía; macOS: `mac.Options.OnUrlOpen`. Registro: `info.protocols` de `wails.json` (NSIS y `Info.plist`) y `MimeType=x-scheme-handler/adesc` en el `.desktop` |
+| Bandeja | Bandeja nativa de Wails v3 (`app.SystemTray.New()` con `app.NewMenu()`). En Linux comprueba disponibilidad de StatusNotifierItem vía D-Bus (`tray_linux.go`). Se eliminó `fyne.io/systray` y el bucle manual de AppKit en macOS |
+| Notificaciones | Servicio de notificaciones nativo de Wails v3 (`github.com/wailsapp/wails/v3/pkg/services/notifications`), con botones «Añadir» / «Ignorar» |
+| Instancia única | `application.SingleInstanceOptions` en `application.New()` (reenvía argumentos y enfoca la ventana existente) |
+| `adesc://` | `events.Common.ApplicationLaunchedWithUrl` de Wails v3 en todas las plataformas y `events.Mac.ApplicationShouldHandleReopen` en macOS. Registro: `protocols` en `wails.yaml`, `Info.plist` y `MimeType=x-scheme-handler/adesc` en el `.desktop` |
+| Diálogos | `app.Dialog.OpenFile()`, `app.Dialog.Question()` y `app.Dialog.Error()` |
+| Ocultar a bandeja | Hook nativo `events.Common.WindowClosing` en la ventana principal |
 | Autoarranque | `emersion/go-autostart` en Linux y macOS; en Windows la clave `HKCU\...\Run` (go-autostart necesita cgo en Windows) |
 | Portapapeles | `golang.design/x/clipboard` v0.11 (Go puro: Windows, macOS, X11/XWayland y Wayland con *data-control*); `wl-paste --watch` como alternativa |
-
-Cuando el proyecto suba a Go ≥ 1.26 se puede migrar a v3 (bandeja,
-notificaciones y ventanas múltiples nativas) sin tocar el contrato con la UI.
 
 ## Modos
 
@@ -117,29 +114,33 @@ debe llamar a `event.preventDefault()` y el script lo respeta.
 
 ## Compilar
 
-Requisitos comunes: Go 1.27, Node ≥ 18 para la Web UI y la CLI de Wails:
+Requisitos comunes: Go 1.27, Node ≥ 18 para la Web UI y opcionalmente la CLI de Wails v3 (`wails3`):
 
 ```sh
-go install github.com/wailsapp/wails/v2/cmd/wails@v2.17.1
+go install github.com/wailsapp/wails/v3/cmd/wails3@v3.1.0
 make web                 # desde la raíz: compila web/dist (embebido)
 cd cmd/adesc-desktop
+```
+
+Desde la raíz del repositorio se puede compilar directamente con Make:
+
+```sh
+make desktop             # compila cmd/adesc-desktop/build/bin/adesc-desktop
+make lint-desktop        # ejecuta golangci-lint en cmd/adesc-desktop con los tags de escritorio
 ```
 
 ### Linux (Debian/Ubuntu)
 
 ```sh
 sudo apt install pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev
-wails build -s -skipbindings -tags webkit2_41
-# o sin la CLI de Wails:
-go build -tags desktop,production,webkit2_41 -o build/bin/adesc-desktop .
+# Compilación directa con tags desktop,production,gtk3:
+go build -tags desktop,production,gtk3 -o build/bin/adesc-desktop .
 # .deb y AppImage (dependen de GTK 3 y WebKitGTK 4.1 del sistema):
 build/linux/package.sh 0.1.0 amd64
 ```
 
-El tag `webkit2_41` es obligatorio para WebKitGTK 4.1 (sin él Wails usa la
-4.0). Opcional: `wl-clipboard` para el portapapeles en Wayland sin
-*data-control* ni XWayland. Las distribuciones que solo traen WebKitGTK 4.0
-necesitan `libwebkit2gtk-4.0-dev` y compilar sin el tag.
+El tag `gtk3` indica a Wails v3 que utilice GTK 3 / WebKitGTK 4.1 en lugar de GTK 4.
+Opcional: `wl-clipboard` para el portapapeles en Wayland sin *data-control* ni XWayland.
 
 ### Windows
 
@@ -147,23 +148,24 @@ No necesita cgo ni compilador de C (WebView2). Para el instalador hace falta
 NSIS (`makensis` en el `PATH`):
 
 ```sh
-wails build -s -skipbindings -nsis
+go build -tags desktop,production -ldflags "-s -w -H=windowsgui" -o build/bin/adesc-desktop.exe .
 ```
 
-El instalador NSIS descarga e instala el runtime de WebView2 si falta y
-registra `adesc://`. También se puede compilar desde Linux:
-`GOOS=windows go build -tags desktop,production -ldflags -H=windowsgui .`
+También se puede compilar desde Linux para Windows sin cgo:
+`GOOS=windows go build -tags desktop,production -ldflags -H=windowsgui -o build/bin/adesc-desktop.exe .`
 
 ### macOS
 
 Necesita las Command Line Tools de Xcode:
 
 ```sh
-wails build -s -skipbindings -platform darwin/universal
+mkdir -p "build/bin/AdminDescargas.app/Contents/MacOS" "build/bin/AdminDescargas.app/Contents/Resources"
+cp build/darwin/Info.plist "build/bin/AdminDescargas.app/Contents/Info.plist"
+go build -tags desktop,production -ldflags "-s -w" -o "build/bin/AdminDescargas.app/Contents/MacOS/adesc-desktop" .
 hdiutil create -volname AdminDescargas -srcfolder build/bin/AdminDescargas.app -ov -format UDZO build/dist/AdminDescargas.dmg
 ```
 
-`build/darwin/Info.plist` fija el identificador `com.admindescargas.desktop` y
+`build/darwin/Info.plist` fija el identificador `io.admindescargas.desktop` y
 registra `adesc://`. Sin cuenta de Apple Developer la app no va firmada ni
 notarizada: la primera vez hay que abrirla con clic derecho › Abrir.
 
@@ -175,10 +177,8 @@ adesc-desktop [--config <config.toml>] [--hidden] [enlaces o adesc://add?url=…
 
 - Logs: `<data_dir>/logs/adesc-desktop.log` (o `log.file`);
   `ADESC_LOG_STDERR=1` los manda a la consola.
-- `wails dev -s` abre la app con la UI embebida. Para recarga en caliente de la
-  UI, `npm run dev` en `web/` contra un daemon.
 - Tests sin GTK: `go test -tags bindings ./...`; con GTK instalado:
-  `go test -tags desktop,production,webkit2_41 ./...`. La lógica compartida se
+  `go test -tags desktop,production,gtk3 ./...`. La lógica compartida se
   prueba desde la raíz: `go test ./internal/desktop/...`.
 - Iconos: `go run tools/genicons/main.go` regenera `build/appicon.png` y los de
   la bandeja (`icons/`).
@@ -186,7 +186,8 @@ adesc-desktop [--config <config.toml>] [--hidden] [enlaces o adesc://add?url=…
 ## CI
 
 El job `desktop` de `.github/workflows/ci.yml` compila en Ubuntu, Windows y
-macOS (`wails build`), genera el `.deb` y el AppImage, el instalador NSIS y el
-`.dmg`, los sube como artefactos y en Linux hace una prueba con `xvfb-run`:
-arranca la app con una configuración temporal y comprueba que la API
-integrada responde en `/api/v1/health` y acepta el token.
+macOS, genera el `.deb` y el AppImage, el ejecutable / instalador y el
+`.dmg`, corre `golangci-lint` sobre el módulo de escritorio, los sube como
+artefactos y en Linux hace una prueba con `xvfb-run`: arranca la app con una
+configuración temporal y comprueba que la API integrada responde en
+`/api/v1/health` y acepta el token Bearer y el origen `wails://localhost`.
