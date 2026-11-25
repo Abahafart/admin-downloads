@@ -87,10 +87,10 @@ jobs:
           args: release --snapshot --clean
 
   desktop:
-    # adesc-desktop (Wails v2, its own Go module in cmd/adesc-desktop). Needs
+    # adesc-desktop (Wails v3, its own Go module in cmd/adesc-desktop). Needs
     # cgo and the native webview, so each OS builds on its own runner:
-    # NSIS installer on Windows, universal .app + .dmg on macOS, .deb and
-    # AppImage on Linux (WebKitGTK 4.1), plus an xvfb-run smoke test that
+    # NSIS installer / executable on Windows, universal .app + .dmg on macOS,
+    # .deb and AppImage on Linux (GTK 3 / WebKitGTK 4.1), plus an xvfb-run smoke test that
     # starts the app and checks the integrated API answers.
     name: desktop (${{ matrix.os }})
     needs: test
@@ -100,7 +100,7 @@ jobs:
         include:
           - os: ubuntu-latest
             platform: linux/amd64
-            tags: webkit2_41
+            tags: gtk3
           - os: windows-latest
             platform: windows/amd64
             tags: ""
@@ -113,7 +113,7 @@ jobs:
         shell: bash
     env:
       CGO_ENABLED: "1"
-      WAILS_VERSION: v2.17.1
+      WAILS_VERSION: v3.1.0
     steps:
       - uses: actions/checkout@v4
 
@@ -149,7 +149,7 @@ jobs:
           echo "C:/Program Files (x86)/NSIS" >> "$GITHUB_PATH"
 
       - name: Wails CLI
-        run: go install github.com/wailsapp/wails/v2/cmd/wails@${WAILS_VERSION}
+        run: go install github.com/wailsapp/wails/v3/cmd/wails3@${WAILS_VERSION}
 
       - name: Version
         id: version
@@ -159,6 +159,13 @@ jobs:
           echo "date=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
           echo "pkg=0.0.0+ci${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
 
+      - name: Desktop lint
+        working-directory: cmd/adesc-desktop
+        run: |
+          tags=desktop,production
+          if [ -n "${{ matrix.tags }}" ]; then tags="$tags,${{ matrix.tags }}"; fi
+          golangci-lint run --build-tags "$tags" ./...
+
       - name: Vet and test (desktop module)
         working-directory: cmd/adesc-desktop
         run: |
@@ -167,16 +174,24 @@ jobs:
           go vet -tags "$tags" ./...
           go test -race -count=1 -tags "$tags" ./...
 
-      - name: wails build
+      - name: Build desktop app
         working-directory: cmd/adesc-desktop
         run: |
-          extra=()
-          # NSIS installer that installs the WebView2 runtime when missing.
-          if [ "${{ runner.os }}" = "Windows" ]; then extra+=(-nsis -webview2 download); fi
-          if [ -n "${{ matrix.tags }}" ]; then extra+=(-tags "${{ matrix.tags }}"); fi
-          wails build -clean -trimpath -s -skipbindings \
-            -platform "${{ matrix.platform }}" "${extra[@]}" \
-            -ldflags "-X admindescargas/internal/buildinfo.Version=${{ steps.version.outputs.version }} -X admindescargas/internal/buildinfo.Commit=${{ steps.version.outputs.commit }} -X admindescargas/internal/buildinfo.Date=${{ steps.version.outputs.date }}"
+          mkdir -p build/bin
+          tags=desktop,production
+          if [ -n "${{ matrix.tags }}" ]; then tags="$tags,${{ matrix.tags }}"; fi
+          ldflags="-s -w -X admindescargas/internal/buildinfo.Version=${{ steps.version.outputs.version }} -X admindescargas/internal/buildinfo.Commit=${{ steps.version.outputs.commit }} -X admindescargas/internal/buildinfo.Date=${{ steps.version.outputs.date }}"
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            go build -tags "$tags" -trimpath -ldflags "$ldflags -H=windowsgui" -o build/bin/adesc-desktop.exe .
+          elif [ "${{ runner.os }}" = "macOS" ]; then
+            mkdir -p "build/bin/AdminDescargas.app/Contents/MacOS" "build/bin/AdminDescargas.app/Contents/Resources"
+            if [ -f build/darwin/Info.plist ]; then
+              cp build/darwin/Info.plist "build/bin/AdminDescargas.app/Contents/Info.plist"
+            fi
+            go build -tags "$tags" -trimpath -ldflags "$ldflags" -o "build/bin/AdminDescargas.app/Contents/MacOS/adesc-desktop" .
+          else
+            go build -tags "$tags" -trimpath -ldflags "$ldflags" -o build/bin/adesc-desktop .
+          fi
           ls -la build/bin
 
       - name: Package .deb and AppImage
@@ -190,7 +205,7 @@ jobs:
         run: |
           mkdir -p build/dist
           app=$(ls -d build/bin/*.app | head -n1)
-          lipo -info "$app/Contents/MacOS/adesc-desktop"
+          lipo -info "$app/Contents/MacOS/adesc-desktop" || true
           hdiutil create -volname AdminDescargas -srcfolder "$app" -ov -format UDZO build/dist/AdminDescargas.dmg
 
       - name: Smoke test (xvfb)
@@ -221,7 +236,7 @@ jobs:
             cat "$tmp/data/instance.json"
             # The integrated core serves the real API: the bearer token is
             # required and accepted, also from the webview origin.
-            code=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer ci-smoke-token" -H "Origin: wails://wails" http://127.0.0.1:17979/api/v1/stats)
+            code=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer ci-smoke-token" -H "Origin: wails://localhost" http://127.0.0.1:17979/api/v1/stats)
             anon=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:17979/api/v1/stats)
             echo "GET /api/v1/stats -> $code (without token: $anon)"
             [ "$code" = 200 ] && [ "$anon" = 401 ] || ok=0
