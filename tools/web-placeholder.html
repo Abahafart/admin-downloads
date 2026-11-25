@@ -7,8 +7,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AdminDescargas</title>
+    <style>
+      /* Explicit colors: the desktop window paints the theme background
+         (dark by default) behind the page, so browser defaults would leave
+         black text on a dark background. */
+      :root { color-scheme: light dark; --bg: #f7f7f8; --fg: #1b1c1f; --code-bg: #e6e7ea; }
+      @media (prefers-color-scheme: dark) {
+        :root { --bg: #16171a; --fg: #e8e9ec; --code-bg: #2a2c31; }
+      }
+      html, body { background: var(--bg); color: var(--fg); }
+      body { font-family: system-ui, sans-serif; line-height: 1.5; max-width: 40rem; margin: 3rem auto; padding: 0 1rem; }
+      code { background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; }
+    </style>
   </head>
-  <body style="font-family: system-ui, sans-serif; max-width: 40rem; margin: 3rem auto">
+  <body>
     <h1>AdminDescargas</h1>
     <p>La interfaz web no está compilada en este binario. Ejecuta <code>make web</code> y vuelve a compilar.</p>
     <p>La API sigue disponible en <code>/api/v1</code>.</p>
